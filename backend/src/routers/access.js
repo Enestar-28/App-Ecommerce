@@ -1,20 +1,28 @@
 const express = require('express')
+const {loginController,
+    registerController,
+    addressesController,
+    meController,
+    updateMeController} = require( '../controllers/users.controller')
+const {
+    loginValidator,
+} = require('../middlewares/user.middlewares')
 
-
-const {registerController,
-    } = require('../controllers/users.controller')
-const {registerValidator} = require('../validators/user.validator')
 
 
 const router = express.Router()
 
 
-router.get('/', (req, res) => {
-    res.send('Hello World!')
-})
 
-router.post('/register',registerValidator, registerController)
+router.post('/login',  loginController)
+router.post('/register',  registerController)
 
+router.post('/addresses',addressesController)
+
+// router.get('/me', meController )
+// router.post('/updateme', updateMeController)
+
+module.exports = router
 
 
 

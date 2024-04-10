@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
     StyleSheet,
     Text,
@@ -7,51 +8,51 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Pressable,
+    Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+
 import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-// import axios from "axios";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
-    // useEffect(() => {
-    //     const checkLoginStatus = async () => {
-    //         try {
-    //             const token = await AsyncStorage.getItem("authToken");
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const token = await AsyncStorage.getItem("authToken");
+// inetrcrpter
+                if (token) {
+                    navigation.replace("Main");
+                }
+            } catch (err) {
+                console.log("error message", err);
+            }
+        };
+        checkLoginStatus();
+    }, []);
+    const handleLogin = () => {
+        const user = {
+            email: email,
+            password: password,
+        };
 
-    //             if (token) {
-    //                 navigation.replace("Main");
-    //             }
-    //         } catch (err) {
-    //             console.log("error message", err);
-    //         }
-    //     };
-    //     checkLoginStatus();
-    // }, []);
-    // const handleLogin = () => {
-    //     const user = {
-    //         email: email,
-    //         password: password,
-    //     };
 
-    //     axios
-    //         .post("http://localhost:8000/login", user)
-    //         .then((response) => {
-    //             console.log(response);
-    //             const token = response.data.token;
-    //             AsyncStorage.setItem("authToken", token);
-    //             navigation.replace("Main");
-    //         })
-    //         .catch((error) => {
-    //             Alert.alert("Login Error", "Invalid Email");
-    //             console.log(error);
-    //         });
-    // };
+        axios.post("http://192.168.45.18:3333/api/v0/login", user)
+            .then((response) => {
+                const token = response.data.accessToken;
+                AsyncStorage.setItem("authToken", token);
+                navigation.replace("Main");
+            })
+            .catch((error) => {
+                Alert.alert("Lỗi đăng nhập", "Email hoặc mật khẩu không đúng");
+                console.log(error);
+            });
+    };
     return (
         <SafeAreaView
             style={styles.container}
@@ -60,7 +61,7 @@ const LoginScreen = () => {
                 <Image
                     style={styles.image}
                     source={{
-                        uri: "https://assets.stickpng.com/thumbs/6160562276000b00045a7d97.png",
+                        uri: "https://images.creativemarket.com/0.1.0/ps/12582373/1200/799/m1/fpnw/wm0/nq-logo-designs-(2)-.jpg?1655371491&s=71428269453e63ca71c0dc8ea3ae5350",
                     }}
                 />
             </View>
@@ -70,7 +71,7 @@ const LoginScreen = () => {
                     <Text
                         style={styles.loginText}
                     >
-                        Login In to your Account
+                        Đăng nhập tài khoản
                     </Text>
                 </View>
 
@@ -89,7 +90,7 @@ const LoginScreen = () => {
                             value={email}
                             onChangeText={(text) => setEmail(text)}
                             style={styles.input}
-                            placeholder="enter your Email"
+                            placeholder="Nhập Email"
                         />
                     </View>
                 </View>
@@ -98,19 +99,16 @@ const LoginScreen = () => {
                     <View
                         style={styles.inputContainer}
                     >
-                        <AntDesign
-                            name="lock1"
-                            size={24}
+                        <Entypo name="key" size={24}
                             color="gray"
-                            style={{ marginLeft: 8 }}
-                        />
+                            style={{ marginLeft: 8 }} />
 
                         <TextInput
                             value={password}
                             onChangeText={(text) => setPassword(text)}
                             secureTextEntry={true}
                             style={styles.input}
-                            placeholder="enter your Password"
+                            placeholder="Nhập Password"
                         />
                     </View>
                 </View>
@@ -123,10 +121,10 @@ const LoginScreen = () => {
                         justifyContent: "space-between",
                     }}
                 >
-                    <Text>Keep me logged in</Text>
+                    <Text>Chúc bạn một ngày tốt lành</Text>
 
                     <Text style={styles.forgotPassword}>
-                        Forgot Password
+                        Quên mật khẩu
                     </Text>
                 </View>
 
@@ -139,7 +137,7 @@ const LoginScreen = () => {
                     <Text
                         style={styles.loginButtonText}
                     >
-                        Login
+                        Đăng nhập
                     </Text>
                 </Pressable>
 
@@ -148,7 +146,7 @@ const LoginScreen = () => {
                     style={{ marginTop: 15 }}
                 >
                     <Text style={styles.signUpText}>
-                        Don't have an account? Sign Up
+                        Bạn chưa có tài khoản? Đăng kí
                     </Text>
                 </Pressable>
             </KeyboardAvoidingView>
@@ -156,7 +154,6 @@ const LoginScreen = () => {
     );
 };
 
-export default LoginScreen;
 
 
 const styles = StyleSheet.create({
@@ -167,14 +164,18 @@ const styles = StyleSheet.create({
         marginTop: 50,
     },
     image: {
+
         width: 150,
-        height: 100,
+        height: 175,
     },
     loginText: {
-        fontSize: 17,
+
+        fontSize: 25,
         fontWeight: 'bold',
         marginTop: 12,
+        marginBottom: 0,
         color: '#041E42',
+
     },
     inputContainer: {
         flexDirection: 'row',
@@ -219,3 +220,5 @@ const styles = StyleSheet.create({
     },
 });
 
+
+export default LoginScreen;

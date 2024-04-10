@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 
-
-const DOCUMENT_NAME = 'User'    
+const DOCUMENT_NAME = 'User'
 const COLLECTION_NAME = 'Users'
-
-
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -20,21 +17,40 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  old_password: {
+    type: Array,
+    default: [],
+  },
   verified: {
     type: Boolean,
     default: false,
   },
-  verificationToken: String,
+  refreshToken: {
+    type: String,
+    default: false,
+  },
+  refreshTokensUsed: {
+    type: [String],
+    default: false,
+  },
+  email_verify_token: {
+    type: String,
+    default: false,
+  },
+  forgot_password_token: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: false,
+  },
   addresses: [
     {
       name: String,
-      mobileNo: String,
-      houseNo: String,
+      number: String,
       street: String,
-      landmark: String,
       city: String,
       country: String,
-      postalCode: String,
     },
   ],
   orders: [
@@ -43,11 +59,9 @@ const userSchema = new mongoose.Schema({
       ref: "Order",
     },
   ],
-
-  timestamps:true,
-  collection: COLLECTION_NAME,
-  
+}, {
+  timestamps: true, // Add timestamps to the document (createdAt, updatedAt)
+  collection: COLLECTION_NAME, // Specify the collection name explicitly
 });
 
-module.exports =  mongoose.model(DOCUMENT_NAME,userSchema);
-
+module.exports = mongoose.model(DOCUMENT_NAME, userSchema);
