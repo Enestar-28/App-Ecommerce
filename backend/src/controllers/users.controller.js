@@ -21,20 +21,47 @@ const registerController = async (req, res) => {
     })
 }
 
-
 const addressesController = async (req, res) => {
-    const result = await UserService.addresses(req.body)
+    const { userId, address } = req.body
+
+    const result = await UserService.addAddress(userId, address)
     return res.json({
         message: 'User created',
+        result
+    })
+}
+const getAdressController = async (req, res) => {
+    const {user_id } = req.params
+    const result = await UserService.getAdress(user_id)
+    return res.json({
+        result
+    })
+}
+
+
+const updateAddressesController = async (req, res) => {
+    const result = await UserService.updateAddress(req.body)
+    return res.json({
+        message: 'update successful',
+        result
+    })
+}
+
+const deleteAddressController = async (req, res) => {
+  
+    const result = await UserService.deleteAddress(req.body)
+    return res.json({
+        message: 'delete successful',
         result
     })
 }
 
 
 const meController = async (req, res) =>{
-    const result = await UserService.getme(req.body)
+    const {userId} = req.params
+    const result = await UserService.getme(userId)
     return res.json({
-        message: 'User created',
+        message: 'get me successful',
         result
     })
 }
@@ -53,5 +80,9 @@ module.exports = {
     loginController,
     registerController,
     addressesController,
-    meController
+    meController,
+    getAdressController,
+    updateAddressesController,
+    deleteAddressController,
+    updateMeController
 }

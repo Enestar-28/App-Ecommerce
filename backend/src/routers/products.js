@@ -3,7 +3,9 @@ const {
     addproController,
     addcatController,
     getcatController,
-    getprobycateController
+    getprobycateController,
+    addorderController,
+    getorderController
 } = require('../controllers/products.controller')
 
 
@@ -23,6 +25,13 @@ router.get('/getprobycate', getprobycateController)
 router.post('/addcategoris', addcatController)
 router.get('/getcategoris', getcatController)
 
+
+
+
+// -------------------------orders-------------------
+
+router.get('/orders/:user_id', getorderController)
+router.post('/orders', addorderController)
 
 
 

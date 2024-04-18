@@ -17,33 +17,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  old_password: {
-    type: Array,
-    default: [],
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-  refreshToken: {
-    type: String,
-    default: false,
-  },
-  refreshTokensUsed: {
-    type: [String],
-    default: false,
-  },
-  email_verify_token: {
-    type: String,
-    default: false,
-  },
-  forgot_password_token: {
-    type: String,
-  },
-  status: {
-    type: String,
-    default: false,
-  },
   addresses: [
     {
       name: String,

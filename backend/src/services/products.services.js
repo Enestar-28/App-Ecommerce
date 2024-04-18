@@ -1,5 +1,7 @@
 const ProductModel = require("../models/product.model");
 const CategoriesModel = require("../models/category.model");
+const usersModel = require("../models/user.model");
+const OrderModel = require("../models/order.model");
 const {ObjectId } = require('mongodb');
 const ProductService = {
     //GET ALL PRODUCTS
@@ -11,7 +13,6 @@ const ProductService = {
             res.status(500).json({ message: "Không lấy được sản phẩm" });
         }
     },
-
     //ADD PRODUCT
     async addProducts(payload) {
         const { title, Price, image, color, size, carouselImages, offer, category_id } = payload
@@ -69,8 +70,62 @@ const ProductService = {
         } catch (error) {
             throw new Error(error);
         }
-    }
+    },
 
+    // Get orders 
+    async getOrders(user_id) {
+        try {
+            const orders = await OrderModel.find({ user: user_id }).populate("user")
+            if (!orders || orders.length === 0) {
+                return res.status(404).json({ message: "Orders not found" });
+            }
+
+            return orders
+        } catch (err) {
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+
+
+
+
+
+
+    //UPDATE PRODUCT
+    async addOrder(payload) {
+       
+        const { userId, cartItems, totalPrice, shippingAddress, paymentMethod } =payload
+        try {
+            const user = await usersModel.findById(userId);
+            if (!user) {
+              return res.status(404).json({ message: "User not found" });
+            }
+           
+            //create an array of product objects from the cart Items
+            const products = cartItems.map((item) => ({
+              name: item?.title,
+              quantity: item.quantity,
+              price: item.price,
+              image: item?.image,
+            }));
+
+            //create a new Order
+            const order = new OrderModel({
+              user: userId,
+              products: products,
+              totalPrice: totalPrice,
+              shippingAddress: shippingAddress,
+              paymentMethod: paymentMethod,
+            });
+            await order.save();
+        
+          } catch (error) {
+            console.log("error creating orders", error);
+            throw new Error(error);
+          }
+        },
+
+    
 }
 
 module.exports = ProductService;

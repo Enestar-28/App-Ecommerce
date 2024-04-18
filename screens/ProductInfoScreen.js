@@ -214,7 +214,7 @@ const ProductInfoScreen = () => {
             >
                 {addedToCart ? (
                     <View>
-                        <Text style={{ color: "#FFFFFF" }}>Đã thêm vào giỏ</Text>
+                        <Text style={{ color: "#F27259" }}>Đã thêm vào giỏ</Text>
                     </View>
                 ) : (
                     <Text style={{ color: "#F27259" }}>Thêm vào giỏ</Text>

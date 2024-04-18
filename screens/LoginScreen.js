@@ -9,23 +9,30 @@ import {
     TextInput,
     Pressable,
     Alert,
+    TouchableOpacity
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from 'react-redux';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { login } from "../redux/AuthReducer";
 
 const LoginScreen = () => {
     const [email, setEmail] = useState("");
+    const [emailVerify, setEmailVerify] = useState(false);
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+
     useEffect(() => {
         const checkLoginStatus = async () => {
             try {
                 const token = await AsyncStorage.getItem("authToken");
-                // inetrcrpter
                 if (token) {
                     navigation.replace("Main");
                 }
@@ -35,6 +42,21 @@ const LoginScreen = () => {
         };
         checkLoginStatus();
     }, []);
+
+    const handleEmail = (value) => {
+        setEmail(value);
+        setEmailVerify(false);
+        if (/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(value)) {
+            setEmail(value);
+            setEmailVerify(true);
+        }
+
+    };
+
+    const toggleShowPassword = () => {
+        setShowPassword((prevShowPassword) => !prevShowPassword);
+    };
+
     const handleLogin = () => {
         const user = {
             email: email,
@@ -43,9 +65,11 @@ const LoginScreen = () => {
 
         axios.post("http://192.168.1.42:3333/api/v0/login", user)
             .then((response) => {
-
-                const token = response.data.accessToken;
+                const token = response.data.result.accessToken;
+                const userId = response.data.result.user._id;
                 AsyncStorage.setItem("authToken", token);
+                AsyncStorage.setItem("UserId", userId);
+                dispatch(login({ token, user: userId }));
                 navigation.replace("Main");
             })
             .catch((error) => {
@@ -88,14 +112,24 @@ const LoginScreen = () => {
 
                         <TextInput
                             value={email}
-                            onChangeText={(text) => setEmail(text)}
+                            onChangeText={(text) => { handleEmail(text); }}
                             style={styles.input}
                             placeholder="Nhập Email"
                         />
+                        {email.length < 1 ? null : emailVerify ? (
+                            < AntDesign style={{ right: 0, marginRight: 10 }} name="checkcircle" size={24} color="green" />
+                        ) : (
+                            <AntDesign style={{ right: 0, marginRight: 10 }} name="closecircle" size={24} color="red" />
+                        )}
                     </View>
+                    {email.length < 1 ? null : emailVerify ? null : (
+                        <Text style={{ margin: 10, color: "red", }}> Nhập sai định dạng Email </Text>
+                    )}
+
+
                 </View>
 
-                <View style={{ marginTop: 10 }}>
+                <View style={{ marginTop: 0 }}>
                     <View
                         style={styles.inputContainer}
                     >
@@ -106,10 +140,13 @@ const LoginScreen = () => {
                         <TextInput
                             value={password}
                             onChangeText={(text) => setPassword(text)}
-                            secureTextEntry={true}
+                            secureTextEntry={!showPassword}
                             style={styles.input}
                             placeholder="Nhập Password"
                         />
+                        <TouchableOpacity onPress={toggleShowPassword} style={{ right: 0, marginRight: 10 }}>
+                            <Entypo name={showPassword ? "eye" : "eye-with-line"} size={24} color="gray" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -190,6 +227,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     input: {
+
         color: 'gray',
         marginVertical: 10,
         width: 300,

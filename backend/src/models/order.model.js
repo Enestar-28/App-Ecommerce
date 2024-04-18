@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 
-const DOCUMENT_NAME = 'Order'
-const COLLECTION_NAME = 'Orders'
-
+const DOCUMENT_NAME = 'Order';
+const COLLECTION_NAME = 'Orders';
 
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    require: true,
+    required: true,
   },
   products: [
     {
@@ -39,11 +38,7 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    mobileNo: {
-      type: String,
-      required: true,
-    },
-    houseNo: {
+    number: {
       type: String,
       required: true,
     },
@@ -51,11 +46,11 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    landmark: {
+    city: {
       type: String,
       required: true,
     },
-    postalCode: {
+    country: {
       type: String,
       required: true,
     },
@@ -64,11 +59,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  timestamps: true,
-  collection: COLLECTION_NAME,
+}, { timestamps: true });
 
-});
-
-
-module.exports = mongoose.model(DOCUMENT_NAME, orderSchema);
-
+module.exports = mongoose.model(DOCUMENT_NAME, orderSchema, COLLECTION_NAME);

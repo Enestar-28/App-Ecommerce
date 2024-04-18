@@ -63,12 +63,39 @@ const getcatController = async (req, res) => {
 
 
 
+
+
+// -----------------------------orders------------------
+
+const addorderController = async (req, res) => {
+    const result = await ProductService.addOrder(req.body)
+    return res.json({
+        message: 'add orders successfull ',
+        result
+    })
+}
+
+const getorderController = async (req, res) => {
+    const result = await ProductService.getOrders(req.params.user_id)
+    return res.json({
+        message: 'get all orders',
+        result
+    })
+}
+
+
+
+
+
+
 //get product by id
 module.exports = {
     getproController,
     addproController,
     addcatController,
     getcatController,
-    getprobycateController
+    getprobycateController,
+    addorderController,
+    getorderController
 }
 

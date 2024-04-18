@@ -28,37 +28,39 @@ const refreshToken = async (payload, privateKey) => {
 }
 
 
-const createTokenPair = async (payload ,privateKey) => {  
-    const {user_id,verify,exp} = payload
-    if(exp){
-        payload = {user_id,verify,exp}
-        try{
-            const accessToken = await jwt.sign({user_id,verify}, privateKey, {
-                expiresIn: '3 days',
+const createTokenPair = async (payload, privateKey) => {
+    const { user_id, verify, exp } = payload
+    if (exp) {
+        payload = { user_id, verify, exp }
+        try {
+            const accessToken = await jwt.sign({ user_id, verify }, privateKey, {
+                algorithm: 'HS256',
+                expiresIn: '365 days',
             });
             const refreshToken = await jwt.sign(payload, privateKey, {
+                algorithm: 'HS256',
 
             });
-            return {accessToken, refreshToken};
-        }catch(error){
-            console.log('error create token pair',error)
+            return { accessToken, refreshToken };
+        } catch (error) {
+            console.log('error create token pair', error)
             throw error;
         }
-    }else{
-        payload = {user_id,verify}
-        try{
+    } else {
+        payload = { user_id, verify }
+        try {
             const accessToken = await jwt.sign(payload, privateKey, {
                 expiresIn: '3 days',
             });
             const refreshToken = await jwt.sign(payload, privateKey, {
                 expiresIn: '365 days',
             });
-            return {accessToken, refreshToken};
-        }catch(error){
+            return { accessToken, refreshToken };
+        } catch (error) {
             throw error;
         }
     }
-    
+
 }
 
 

@@ -7,6 +7,7 @@ import {
   TextInput,
 } from "react-native";
 import React, { useEffect, useContext, useState, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
@@ -16,155 +17,178 @@ import { UserType } from "../UserContext";
 
 const AddAddressScreen = () => {
   const navigation = useNavigation();
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [country, seCountry] = useState("");
+  const [addresses, setAddresses] = useState([]);
+  const { userId, setUserId } = useContext(UserType);
+  
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+  const fetchAddresses = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("UserId");
+      console.log("userId", userId);
+      const response = await axios.get(
+        `http://192.168.1.42:3333/api/v0/address/${userId}`
+      );
+      const addresses = response.data.result;
 
-
-  const handleAddAddress = () => {
-    const address = {
-      name,
-      number,
-      street,
-      city,
-      country
-
+      setAddresses(addresses);
+    } catch (error) {
+      console.log("error", error);
     }
-  }
-
+  };
+  //refresh the addresses when the component comes to the focus ie basically when we navigate back
+  useFocusEffect(
+    useCallback(() => {
+      fetchAddresses();
+    }, [])
+  );
   return (
-    <ScrollView style={{ marginTop: 50 }}>
-      <View style={{ height: 50, backgroundColor: "#FFEEE8" }} />
-
-      <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 17, fontWeight: "bold" }}>
-          Thêm địa chỉ mới
-        </Text>
-
-        <TextInput
-          placeholderTextColor={"black"}
-          placeholder="Nhập tên địa chỉ của bạn"
-          style={{
-            padding: 10,
-            borderColor: "#D0D0D0",
-            borderWidth: 1,
-            marginTop: 10,
-            borderRadius: 5,
-          }}
-        />
-
-        <View style={{ marginVertical: 10 }}>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Nhập tên của bạn
-          </Text>
-
-          <TextInput
-            value={name}
-            onChangeText={(text) => setName(text)}
-            placeholderTextColor={"black"}
-            style={{
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            placeholder="Nhập tên của bạn"
-          />
-        </View>
-
-        <View>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Nhập số điện thoại
-          </Text>
-
-          <TextInput
-            value={number}
-            onChangeText={(text) => setMobileNo(text)}
-            placeholderTextColor={"black"}
-            style={{
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            placeholder="Nhâp số điện thoại của bạn"
-          />
-        </View>
-
-        <View style={{ marginVertical: 10 }}>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Nhập số nhà, tên đường
-          </Text>
-
-          <TextInput
-            value={street}
-            onChangeText={(text) => setHouseNo(text)}
-            placeholderTextColor={"black"}
-            style={{
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            placeholder="Nhâp số nhà, tên đường của bạn"
-          />
-        </View>
-
-        <View>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Nhập tên thành phố
-          </Text>
-          <TextInput
-            value={city}
-            onChangeText={(text) => setStreet(text)}
-            placeholderTextColor={"black"}
-            style={{
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            placeholder="Nhập tên thành phố của bạn"
-          />
-        </View>
-
-
-        <View>
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>Country</Text>
-
-          <TextInput
-            value={country}
-            onChangeText={(text) => setPostalCode(text)}
-            placeholderTextColor={"black"}
-            style={{
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            placeholder="Nhập tên quốc gia của bạn"
-          />
-        </View>
-
+    <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 50 }}>
+      <View
+        style={{
+          backgroundColor: "#00CED1",
+          padding: 10,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
         <Pressable
-          onPress={handleAddAddress}
           style={{
-            backgroundColor: "#EE4D2D",
-            padding: 19,
-            borderRadius: 6,
-            justifyContent: "center",
+            flexDirection: "row",
             alignItems: "center",
-            marginTop: 20,
+            marginHorizontal: 7,
+            gap: 10,
+            backgroundColor: "white",
+            borderRadius: 3,
+            height: 38,
+            flex: 1,
           }}
         >
-          <Text style={{ fontWeight: "bold" }}>Thêm địa chỉ</Text>
+          <AntDesign
+            style={{ paddingLeft: 10 }}
+            name="search1"
+            size={22}
+            color="black"
+          />
+          <TextInput placeholder="Search Amazon.in" />
+        </Pressable>
+
+        <Feather name="mic" size={24} color="black" />
+      </View>
+
+      <View style={{ padding: 10 }}>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Your Addresses</Text>
+
+        <Pressable
+          onPress={() => navigation.navigate("Add")}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 10,
+            borderColor: "#D0D0D0",
+            borderWidth: 1,
+            borderLeftWidth: 0,
+            borderRightWidth: 0,
+            paddingVertical: 7,
+            paddingHorizontal: 5,
+          }}
+        >
+          <Text>Add a new Address</Text>
+          <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+        </Pressable>
+
+        <Pressable>
+          {/* all the added adresses */}
+          {addresses?.map((item, index) => (
+            <Pressable
+              style={{
+                borderWidth: 1,
+                borderColor: "#D0D0D0",
+                padding: 10,
+                flexDirection: "column",
+                gap: 5,
+                marginVertical: 10,
+              }}
+            >
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
+              >
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                  {item?.name}
+                </Text>
+                <Entypo name="location-pin" size={24} color="red" />
+              </View>
+
+              <Text style={{ fontSize: 15, color: "#181818" }}>
+                {item?.number}, {item?.landmark}
+              </Text>
+
+              <Text style={{ fontSize: 15, color: "#181818" }}>
+                {item?.street}
+              </Text>
+
+              <Text style={{ fontSize: 15, color: "#181818" }}>
+                India, Bangalore
+              </Text>
+
+              <Text style={{ fontSize: 15, color: "#181818" }}>
+                phone No : {item?.city} 
+              </Text>
+              <Text style={{ fontSize: 15, color: "#181818" }}>
+                pin code : {item?.country}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 10,
+                  marginTop: 7,
+                }}
+              >
+                <Pressable
+                  style={{
+                    backgroundColor: "#F5F5F5",
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 5,
+                    borderWidth: 0.9,
+                    borderColor: "#D0D0D0",
+                  }}
+                >
+                  <Text>Edit</Text>
+                </Pressable>
+
+                <Pressable
+                  style={{
+                    backgroundColor: "#F5F5F5",
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 5,
+                    borderWidth: 0.9,
+                    borderColor: "#D0D0D0",
+                  }}
+                >
+                  <Text>Remove</Text>
+                </Pressable>
+
+                <Pressable
+                  style={{
+                    backgroundColor: "#F5F5F5",
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 5,
+                    borderWidth: 0.9,
+                    borderColor: "#D0D0D0",
+                  }}
+                >
+                  <Text>Set as Default</Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          ))}
         </Pressable>
       </View>
     </ScrollView>

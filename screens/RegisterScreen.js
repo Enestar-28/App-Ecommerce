@@ -15,6 +15,9 @@ import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { register } from '../redux/AuthReducer';
+
 import axios from 'axios';
 
 const RegisterScreen = () => {
@@ -22,6 +25,7 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     const handleRegister = () => {
         const user = {
@@ -33,14 +37,16 @@ const RegisterScreen = () => {
         axios
             .post('http://192.168.1.42:3333/api/v0/register', user)
             .then((response) => {
-                console.log(response);
                 Alert.alert(
                     'Đăng kí thành công',
                     'Bạn đã đăng kí thành công, hãy đăng nhập để tiếp tục sử dụng dịch vụ'
                 );
+                
+                dispatch(register({ email: user.email}));
                 setName('');
                 setEmail('');
                 setPassword('');
+                navigation.navigate('Login');
             })
             .catch((error) => {
                 Alert.alert('Đăng kí lỗi', 'Lỗi xảy ra trong quá trình đăng kí tài khoản');

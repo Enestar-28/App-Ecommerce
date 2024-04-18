@@ -18,10 +18,5 @@ var CategoriesSchema = new mongoose.Schema({
     collection: COLLECTION_NAME,
 });
 
-//Export the model
+
 module.exports = mongoose.model(DOCUMENT_NAME, CategoriesSchema);
-// {
-//     id: "0",
-//     image: "https://m.media-amazon.com/images/I/41EcYoIZhIL._AC_SY400_.jpg",
-//     name: "Home",
-// },

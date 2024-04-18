@@ -22,7 +22,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { BottomModal, SlideAnimation, ModalContent } from "react-native-modals";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { UserType } from "../UserContext";
 const HomeScreen = () => {
 
     const images = [
@@ -98,9 +100,9 @@ const HomeScreen = () => {
     const navigation = useNavigation();
     const [open, setOpen] = useState(false);
     const [addresses, setAddresses] = useState([]);
-    const [category, setCategory] = useState("Nam");
-    // const { userId, setUserId } = useContext(UserType);
+    const { userId, setUserId } = useContext(UserType);
     const [selectedAddress, setSelectedAdress] = useState("");
+    const [category, setCategory] = useState("Nam");
 
     const [items, setItems] = useState([
         { label: "Điện tử", value: "Điện tử" },
@@ -133,8 +135,34 @@ const HomeScreen = () => {
         setCompanyOpen(false);
     }, []);
 
-    const cart = useSelector((state) => state.cart.cart);
+    // const cart = useSelector((state) => state.cart.cart);
     const [modalVisible, setModalVisible] = useState(false);
+    useEffect(() => {
+        if (userId) {
+            fetchAddresses();
+        }
+    }, [userId, modalVisible]);
+
+    const fetchAddresses = async () => {
+        try {
+            const response = await axios.get(
+                `http://192.168.1.42:3333/api/v0/address/${userId}`
+            );
+
+            const addresses = response.data.result;
+            setAddresses(addresses);
+        } catch (error) {
+            console.log("error", error);
+        }
+    };
+    useEffect(() => {
+        const fetchUser = async () => {
+            const userId = await AsyncStorage.getItem("UserId");
+            setUserId(userId);
+        };
+
+        fetchUser();
+    }, []);
 
     return (
         <>
@@ -190,11 +218,11 @@ const HomeScreen = () => {
                         <Pressable>
                             {selectedAddress ? (
                                 <Text>
-                                    Giao Đến Địa chỉ này
+                                    Deliver to {selectedAddress?.name} - {selectedAddress?.street}
                                 </Text>
                             ) : (
                                 <Text style={{ fontSize: 13, fontWeight: "500" }}>
-                                    Vận chuyển đến Đại Học Xây Dựng, ...
+                                    Add a Address
                                 </Text>
                             )}
                         </Pressable>
@@ -439,6 +467,53 @@ const HomeScreen = () => {
                     </View>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {/* already added addresses */}
+                        {addresses?.map((item, index) => (
+                            <Pressable
+                                onPress={() => setSelectedAdress(item)}
+                                style={{
+                                    width: 140,
+                                    height: 140,
+                                    borderColor: "#D0D0D0",
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    gap: 3,
+                                    marginRight: 15,
+                                    marginTop: 10,
+                                    backgroundColor: selectedAddress === item ? "#FBCEB1" : "white"
+                                }}
+                            >
+                                <View
+                                    style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
+                                >
+                                    <Text style={{ fontSize: 13, fontWeight: "bold" }}>
+                                        {item?.name}
+                                    </Text>
+                                    <Entypo name="location-pin" size={24} color="red" />
+                                </View>
+
+                                <Text
+                                    numberOfLines={1}
+                                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                                >
+                                    {item?.houseNo},{item?.landmark}
+                                </Text>
+
+                                <Text
+                                    numberOfLines={1}
+                                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                                >
+                                    {item?.street}
+                                </Text>
+                                <Text
+                                    numberOfLines={1}
+                                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                                >
+                                    India, Bangalore
+                                </Text>
+                            </Pressable>
+                        ))}
 
                         <Pressable
                             onPress={() => {
@@ -449,18 +524,22 @@ const HomeScreen = () => {
                                 width: 140,
                                 height: 140,
                                 borderColor: "#D0D0D0",
+                                marginTop: 10,
                                 borderWidth: 1,
                                 padding: 10,
                                 justifyContent: "center",
                                 alignItems: "center",
-                                gap: 3,
-                                marginRight: 15,
-                                marginTop: 10,
-                                // backgroundColor: selectedAddress === item ? "#FBCEB1" : "white"
                             }}
                         >
-
-                            <Text style={{ fontSize: 16, fontWeight: "500" }}> Thêm địa chỉ mới</Text>
+                            <Text
+                                style={{
+                                    textAlign: "center",
+                                    color: "#0066b2",
+                                    fontWeight: "500",
+                                }}
+                            >
+                                Add an Address or pick-up point
+                            </Text>
                         </Pressable>
                     </ScrollView>
                     <View style={{ flexDirection: "column", gap: 7, marginBottom: 30 }}>

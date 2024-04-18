@@ -10,7 +10,7 @@ const {
 // const USERS_MESSAGES = require('../constants/messages')
 const { checkEmails } = require('../utils/email')
 const tokenModel = require('../models/token.model')
-const userModel = require('../models/user.model')
+
 require('dotenv').config()
 
 
@@ -41,8 +41,6 @@ let UserService = {
             throw e;
         }
     },
-
-
 
     // LOGIN
     login: async (payload) => {
@@ -77,32 +75,91 @@ let UserService = {
 
     },
 
+    // logout: async (payload) = {
+
+    // },
+
 
     //add a address
-    addAddress: async (payload) => {
-        const { user_id, address } = payload
-        const user = await usersModel.findOne({ _id: user_id })
-        user.addresses.push(address)
-        await user.save()
-        return user.addresses
+    addAddress: async (userId, address) => {
+
+        try {
+            // Find the user by userId
+            const user = await usersModel.findById(userId);
+            if (!user) {
+                throw new Error({ message: "User not found" });
+            }
+            // Add the new address to the addresses array
+            user.addresses.push(address);
+            // Save the updated user document
+            await user.save();
+            return user;
+        } catch (error) {
+            console.error("Error adding address:", error);
+            throw error;
+        }
     },
 
+
+
+
     //get a address 
-    getresses: async (payload) => {
+    getAdress: async (user_id) => {
         try {
-            const { user_id } = payload
             const user = await usersModel.findOne({ _id: user_id })
             return user.addresses
+            
         } catch (err) {
-            throw (err)
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+    updateAddress: async (payload) => {
+        try {
+            const { user_id, address_id, addressData } = payload
+            const user = await usersModel.findOne({ _id: user_id })
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            const address = user.addresses.id(address_id);
+            if (!address) {
+                return res.status(404).json({ message: "Address not found" });
+            }
+            // Update the address fields
+            address.set(addressData);
+            // Save the updated user document
+            await user.save();
+            return res.status(200).json({ message: "Address updated successfully", user });
+        } catch (error) {
+            console.error("Error updating address:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+    deleteAddress: async (payload) => {
+        try {
+            const { user_id, address_id } = payload
+            const user = await usersModel.findOne({ _id: user_id })
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            const address = user.addresses.id(address_id);
+            if (!address) {
+                return res.status(404).json({ message: "Address not found" });
+            }
+            // Remove the address from the addresses array
+            address.remove();
+            // Save the updated user document
+            await user.save();
+            return res.status(200).json({ message: "Address deleted successfully", user });
+        } catch (error) {
+            console.error("Error deleting address:", error);
+            return res.status(500).json({ message: "Internal server error" });
         }
     },
 
     // get profie 
-    getme: async (payload) => {
+    getme: async (userId) => {
         try {
-            const { user_id } = payload
-            const user = await userModel.findOne({ _id: user_id })
+            const user = await usersModel.findOne({ _id: userId })
             return user
         } catch (err) {
             throw (err)
@@ -112,7 +169,7 @@ let UserService = {
     updateMe: async (payload) => {
         try {
             const { user_id, name, email, addresses } = payload
-            const user = await userModel.findOneAndUpdate({ _id: user_id }, {
+            const user = await usersModel.findOneAndUpdate({ _id: user_id }, {
                 name,
                 email,
                 addresses,
