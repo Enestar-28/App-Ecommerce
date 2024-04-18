@@ -10,7 +10,7 @@ const ProductService = {
             const products = await ProductModel.find();
             return products;
         } catch (error) {
-            res.status(500).json({ message: "Không lấy được sản phẩm" });
+            throw new Error("Không lấy được sản phẩm");
         }
     },
     //ADD PRODUCT
@@ -30,7 +30,7 @@ const ProductService = {
             console.log("newProduct", newProduct);  
         } catch (error) {
             console.log("error adding product", error);
-            throw new Error(error);
+            throw new Error("Không thêm được sản phẩm");
         }
 
     },
@@ -41,7 +41,7 @@ const ProductService = {
             const products = await ProductModel.find({ category_id: new ObjectId(category_id) })
             return products;
         } catch (error) {
-            throw new Error(error);
+            throw new Error("Không lấy được sản phẩm theo danh mục");
         }
     },
 
@@ -59,7 +59,7 @@ const ProductService = {
             console.log("newCategory", newCategory);
         } catch (error) {
             console.log("error adding category", error);
-            throw new Error(error);
+            throw new Error("Không thêm được danh mục");
         }
 
     },
@@ -68,7 +68,7 @@ const ProductService = {
             const category = await CategoriesModel.find();
             return category;
         } catch (error) {
-            throw new Error(error);
+            throw new Error("Không lấy được danh mục");
         }
     },
 
@@ -77,12 +77,12 @@ const ProductService = {
         try {
             const orders = await OrderModel.find({ user: user_id }).populate("user")
             if (!orders || orders.length === 0) {
-                return res.status(404).json({ message: "Orders not found" });
+                throw new Error("Không tìm thấy đơn hàng");
             }
 
             return orders
         } catch (err) {
-            return res.status(500).json({ message: "Internal server error" });
+            throw new Error("Không tìm thấy đơn hàng");
         }
     },
 
@@ -98,7 +98,7 @@ const ProductService = {
         try {
             const user = await usersModel.findById(userId);
             if (!user) {
-              return res.status(404).json({ message: "User not found" });
+                throw new Error("Không tìm thấy người dùng");
             }
            
             //create an array of product objects from the cart Items
@@ -121,7 +121,7 @@ const ProductService = {
         
           } catch (error) {
             console.log("error creating orders", error);
-            throw new Error(error);
+            throw new Error("Không thêm được đơn hàng");
           }
         },
 

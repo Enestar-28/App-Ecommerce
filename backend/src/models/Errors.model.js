@@ -10,15 +10,16 @@ class ErrorWithStatus {
 
 class EntityError extends ErrorWithStatus {
     
-    constructor({ message ="Lỗi nhập từ bàn phím", errors }) {
-        super(422, message); 
+    constructor({ message = USERS_MESSAGES.VALIDATION_ERROR, errors }) {
+        super(HTTP_STATUS.UNPROCESSABLE_ENTITY, message); 
         this.errors = errors;
 
         
     }
 }
 
-module.exports = {
-    ErrorWithStatus,
-    EntityError
-}
+module.exports =  EntityError
+
+
+
+

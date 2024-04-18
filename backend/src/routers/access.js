@@ -12,29 +12,29 @@ const {
 } = require('../middlewares/user.middlewares')
 const { updateMe } = require('../services/users.services')
 
-
+const wrapAsync = require('../utils/handlers')
 
 const router = express.Router()
 
 
 
-router.post('/login',  loginController)
-router.post('/register',  registerController)
+router.post('/login',loginValidator, wrapAsync(loginController))
+router.post('/register',  wrapAsync(registerController))
 
 // //log out 
 // router.post('logout', logoutController)
 
 
 
-router.get('/address/:user_id', getAdressController)
-router.post('/address',addressesController)
-router.put('/address', updateAddressesController)
-router.post('/delete-address', deleteAddressController)
+router.get('/address/:user_id', wrapAsync(getAdressController))
+router.post('/address',wrapAsync(addressesController))
+router.put('/address', wrapAsync(updateAddressesController))
+router.post('/delete-address', wrapAsync(deleteAddressController))
 
 
 
-router.get('/me/:userId', meController )
-router.put('/me', updateMeController)
+router.get('/me/:userId', wrapAsync(meController))
+router.put('/me', wrapAsync(updateMeController))
 
 
 

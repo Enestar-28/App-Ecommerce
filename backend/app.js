@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors'); // Cần cài đặt thư viện cors
-
+const defaultErrorHandler = require('./src/middlewares/errors.middlewares')
 
 const app = express()
 app.use(express.json())
@@ -21,6 +21,8 @@ app.use(cors({
 require('./src/dbs/init.mongodb')
 // // init routes
 app.use('/', require('./src/routers/index'))
+
+app.use(defaultErrorHandler)
 
 
 

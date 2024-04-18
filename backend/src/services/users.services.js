@@ -7,6 +7,7 @@ const {
     generateTokenToken,
     refreshToken
 } = require('../utils/jwt')
+
 // const USERS_MESSAGES = require('../constants/messages')
 const { checkEmails } = require('../utils/email')
 const tokenModel = require('../models/token.model')
@@ -38,7 +39,7 @@ let UserService = {
             const result = await createTokenPair({ user_id, verify }, process.env.JWT_SECRET);
             return result
         } catch (e) {
-            throw e;
+            throw new Error("Không thể tạo tài khoản");
         }
     },
 
@@ -48,7 +49,7 @@ let UserService = {
 
         const user = await usersModel.findOne({ email: email });
         if (!user) {
-            throw new ErrorWithStatus({ message: "Không tìm thấy user", status: 400 });
+            throw new Error("Không tìm thấy user")
         }
         user_id = user._id.toString()
         verify = user.verified
@@ -87,7 +88,7 @@ let UserService = {
             // Find the user by userId
             const user = await usersModel.findById(userId);
             if (!user) {
-                throw new Error({ message: "User not found" });
+                throw new Error({ message: "Không tìm thấy người dùng" });
             }
             // Add the new address to the addresses array
             user.addresses.push(address);
@@ -96,7 +97,7 @@ let UserService = {
             return user;
         } catch (error) {
             console.error("Error adding address:", error);
-            throw error;
+            throw new Error("Không thêm được địa chỉ ");
         }
     },
 
@@ -110,7 +111,7 @@ let UserService = {
             return user.addresses
             
         } catch (err) {
-            return res.status(500).json({ message: "Internal server error" });
+            throw new Error("Không tìm thấy địa chỉ"); 
         }
     },
     updateAddress: async (payload) => {
@@ -118,20 +119,20 @@ let UserService = {
             const { user_id, address_id, addressData } = payload
             const user = await usersModel.findOne({ _id: user_id })
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                throw new Error("Không tìm thấy người dùng ");
             }
             const address = user.addresses.id(address_id);
             if (!address) {
-                return res.status(404).json({ message: "Address not found" });
+                throw new Error("Không tìm thấy địa chỉ ");
             }
             // Update the address fields
             address.set(addressData);
             // Save the updated user document
             await user.save();
-            return res.status(200).json({ message: "Address updated successfully", user });
+            
         } catch (error) {
             console.error("Error updating address:", error);
-            return res.status(500).json({ message: "Internal server error" });
+            throw new Error("Không thể cập nhật địa chỉ ");
         }
     },
     deleteAddress: async (payload) => {
@@ -139,20 +140,20 @@ let UserService = {
             const { user_id, address_id } = payload
             const user = await usersModel.findOne({ _id: user_id })
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                throw new Error("Không tìm thấy người dùng");
             }
             const address = user.addresses.id(address_id);
             if (!address) {
-                return res.status(404).json({ message: "Address not found" });
+                throw new Error("Không tìm thấy địa chỉ");
             }
             // Remove the address from the addresses array
             address.remove();
             // Save the updated user document
             await user.save();
-            return res.status(200).json({ message: "Address deleted successfully", user });
+           
         } catch (error) {
             console.error("Error deleting address:", error);
-            return res.status(500).json({ message: "Internal server error" });
+            throw new Error("Không thể xóa địa chỉ");
         }
     },
 
@@ -162,7 +163,7 @@ let UserService = {
             const user = await usersModel.findOne({ _id: userId })
             return user
         } catch (err) {
-            throw (err)
+           throw new Error("Không tìm thấy người dùng");
         }
     },
 
@@ -179,7 +180,7 @@ let UserService = {
 
         }
         catch (err) {
-            throw (err)
+            throw new Error("Không thể cập nhật thông tin");
         }
 
 

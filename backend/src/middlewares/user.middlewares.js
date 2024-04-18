@@ -7,7 +7,7 @@ const {ErrorWithStatus} = require('../models/Errors.model');
 const {verifyToken} = require('../utils/jwt');
 const { Error } = require('mongoose');
 const {hashPassword} = require('../utils/crypto')
-// const {bcrypt} = require('bcrypt');
+const bcrypt= require('bcrypt');
 require('dotenv').config();
 
 const userSchema = {
@@ -28,8 +28,16 @@ const loginValidator = validate(checkSchema({
   password: {
     trim: true,
     isLength: {
-      options: { min: 6 },
+      options: { min: 2},
       errorMessage: 'Password must be at least 6 characters long',
+    },custom: {
+      options: async (value,{req}) => {
+        const isMatch = await bcrypt.compare(value, req.user.password);
+        if (!isMatch) {
+          throw new Error("Nhập sai mật khẩu ");
+        }
+        return true;
+      },
     },
   },
 },['body']));
