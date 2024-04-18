@@ -111,7 +111,7 @@ const HomeScreen = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://192.168.45.18:3333/api/v0/getproducts");
+                const response = await axios.get("http://192.168.1.42:3333/api/v0/getproducts");
                 setProducts(response.data.result);
 
             } catch (error) {
@@ -120,7 +120,7 @@ const HomeScreen = () => {
         };
         const categoiesData = async () => {
             try {
-                const response = await axios.get("http://192.168.45.18:3333/api/v0/getcategoris");
+                const response = await axios.get("http://192.168.1.42:3333/api/v0/getcategoris");
                 setCategoies(response.data.result);
             } catch (error) {
                 console.log("error message", error);

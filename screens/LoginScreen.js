@@ -25,7 +25,7 @@ const LoginScreen = () => {
         const checkLoginStatus = async () => {
             try {
                 const token = await AsyncStorage.getItem("authToken");
-// inetrcrpter
+                // inetrcrpter
                 if (token) {
                     navigation.replace("Main");
                 }
@@ -41,9 +41,9 @@ const LoginScreen = () => {
             password: password,
         };
 
-
-        axios.post("http://192.168.45.18:3333/api/v0/login", user)
+        axios.post("http://192.168.1.42:3333/api/v0/login", user)
             .then((response) => {
+
                 const token = response.data.accessToken;
                 AsyncStorage.setItem("authToken", token);
                 navigation.replace("Main");
