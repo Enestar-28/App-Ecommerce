@@ -14,7 +14,7 @@ import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { logoutAsync } from '../redux/AuthReducer';
+import { logout } from '../redux/auth/AuthActions.js';
 
 
 const ProfileScreen = () => {
@@ -29,16 +29,8 @@ const ProfileScreen = () => {
     navigation.setOptions({
       headerTitle: "",
       headerStyle: {
-        backgroundColor: "#00CED1",
+        backgroundColor: "#F6412E",
       },
-      headerLeft: () => (
-        <Image
-          style={{ width: 140, height: 120, resizeMode: "contain" }}
-          source={{
-            uri: "https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c518.png",
-          }}
-        />
-      ),
       headerRight: () => (
         <View
           style={{
@@ -59,15 +51,18 @@ const ProfileScreen = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        
-
-       
-
-      
+        const userId = await AsyncStorage.getItem("UserId");
         const response = await axios.get(
-          `http://localhost:8000/profile/${userId}`
+          `http://172.20.10.4:3333/api/v0/me/`, {
+          params: {
+            user_id: userId,
+          }
+        }
         );
-        const { user } = response.data;
+        console.log("response", response);
+        const { user } = response.data.result;
+        console.log
+        console.log("user", user);
         setUser(user);
       } catch (error) {
         console.log("error", error);
@@ -77,32 +72,33 @@ const ProfileScreen = () => {
     fetchUserProfile();
   }, []);
 
-
-
-
-
   const handleLogout = () => {
-    dispatch(logoutAsync(navigation));
+    dispatch(logout());
+    navigation.replace("Login");
+    
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/orders/${userId}`
-        );
-        const orders = response.data.orders;
-        setOrders(orders);
+  // useEffect(() => {
+  //   const fetchOrders = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://172.20.10.4:3333/api/v0/orders/`, {
+  //         params: {
+  //           user_id: userId,
+  //         }
+  //       });
+  //       console.log("response", response);
+  //       const orders = response.data.result;
+  //       setOrders(orders);
 
-        setLoading(false);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.log("error", error);
+  //     }
+  //   };
 
-    fetchOrders();
-  }, []);
-  console.log("orders", orders);
+  //   fetchOrders();
+  // }, []);
   return (
     <ScrollView style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
       <Text style={{ fontSize: 16, fontWeight: "bold" }}>

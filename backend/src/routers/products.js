@@ -5,17 +5,22 @@ const {
     getcatController,
     getprobycateController,
     addorderController,
-    getorderController
+    getorderController,
+    getAllProController,
+    getcatebynameController
 } = require('../controllers/products.controller')
 
 
 const express = require('express')
 const router = express.Router()
 
-
 router.post('/addproducts', addproController)
 router.get('/getproducts', getproController)
-router.get('/getprobycate', getprobycateController)
+router.get('/get-all-products', getAllProController)
+router.get('/getprobycate/:categoryId', getprobycateController)
+
+
+
 
 
 
@@ -24,6 +29,8 @@ router.get('/getprobycate', getprobycateController)
 
 router.post('/addcategoris', addcatController)
 router.get('/getcategoris', getcatController)
+router.get('/category', getcatebynameController)
+
 
 
 

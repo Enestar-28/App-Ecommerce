@@ -14,69 +14,93 @@ import {
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from 'react-redux';
-import axios from "axios";
+import { useDispatch } from 'react-redux';``
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { login } from "../redux/AuthReducer";
+import { login } from '../redux/auth/AuthActions.js';
+
+
+
 
 const LoginScreen = () => {
-    const [email, setEmail] = useState("");
-    const [emailVerify, setEmailVerify] = useState(false);
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState(null);
+    const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState(null);
+    const [touched, setTouched] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const [showPassword, setShowPassword] = useState(false);
 
-    useEffect(() => {
-        const checkLoginStatus = async () => {
-            try {
-                const token = await AsyncStorage.getItem("authToken");
-                if (token) {
-                    navigation.replace("Main");
-                }
-            } catch (err) {
-                console.log("error message", err);
-            }
-        };
-        checkLoginStatus();
-    }, []);
+    
+    
 
-    const handleEmail = (value) => {
-        setEmail(value);
-        setEmailVerify(false);
-        if (/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(value)) {
-            setEmail(value);
-            setEmailVerify(true);
+    const handleEmailChange = (text) => {
+        setEmail(text);
+        // Người dùng đã bắt đầu nhập
+        setTouched(true);
+        const errors = validateEmail(text);
+        setEmailError(errors.length > 0 ? errors[0] : null);
+    };
+
+    const validateEmail = (email) => {
+        const errors = [];
+        // Kiểm tra định dạng email
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.push('Email không hợp lệ');
         }
+        return errors;
+    };
 
+    const handlePasswordChange = (text) => {
+        setPassword(text);
+        setTouched(true); // Người dùng đã bắt đầu nhập
+        const errors = validatePassword(text);
+        setPasswordError(errors.length > 0 ? errors[0] : null);
     };
 
     const toggleShowPassword = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword);
     };
 
+    const validatePassword = (password) => {
+        const errors = [];
+        // Kiểm tra độ dài của mật khẩu
+        if (password.length < 8) {
+            errors.push('Mật khẩu phải có ít nhất 8 ký tự');
+        }
+        // Kiểm tra có ít nhất một số
+        if (!/\d/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một số');
+        }
+        // Kiểm tra có ít nhất một chữ cái viết hoa và một chữ cái viết thường
+        if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một chữ cái viết hoa và một chữ cái viết thường');
+        }
+        // Kiểm tra có ít nhất một ký tự đặc biệt
+        if (!/[^A-Za-z0-9]/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một ký tự đặc biệt');
+        }
+        return errors;
+    };
+
     const handleLogin = () => {
+        if (emailError) {
+            Alert.alert('Lỗi', 'Vui lòng nhập Email hợp lệ trước khi đăng nhập.');
+            return;
+        }
+        if (passwordError) {
+            Alert.alert('Lỗi', 'Vui lòng nhập mật khẩu hợp lệ trước khi đăng nhập.');
+            return;
+        }
         const user = {
             email: email,
             password: password,
         };
-
-        axios.post("http://192.168.1.42:3333/api/v0/login", user)
-            .then((response) => {
-                const token = response.data.result.accessToken;
-                const userId = response.data.result.user._id;
-                AsyncStorage.setItem("authToken", token);
-                AsyncStorage.setItem("UserId", userId);
-                dispatch(login({ token, user: userId }));
-                navigation.replace("Main");
-            })
-            .catch((error) => {
-                Alert.alert("Lỗi đăng nhập", "Email hoặc mật khẩu không đúng");
-                console.log(error);
-            });
+        dispatch(login({ user, navigation })); 
+        
     };
+
     return (
         <SafeAreaView
             style={styles.container}
@@ -100,53 +124,36 @@ const LoginScreen = () => {
                 </View>
 
                 <View style={{ marginTop: 70 }}>
-                    <View
-                        style={styles.inputContainer}
-                    >
-                        <MaterialIcons
-                            style={styles.icon}
-                            name="email"
-                            size={24}
-                            color="gray"
-                        />
-
-                        <TextInput
-                            value={email}
-                            onChangeText={(text) => { handleEmail(text); }}
-                            style={styles.input}
-                            placeholder="Nhập Email"
-                        />
-                        {email.length < 1 ? null : emailVerify ? (
-                            < AntDesign style={{ right: 0, marginRight: 10 }} name="checkcircle" size={24} color="green" />
-                        ) : (
-                            <AntDesign style={{ right: 0, marginRight: 10 }} name="closecircle" size={24} color="red" />
-                        )}
+                    <View>
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons name="email" size={24} color="gray" style={{ marginLeft: 8 }} />
+                            <TextInput
+                                value={email}
+                                onChangeText={handleEmailChange}
+                                style={styles.input}
+                                placeholder="Nhập Email"
+                            />
+                        </View>
+                        {emailError && <Text style={{ color: 'red', marginTop: 5 }}>{emailError}</Text>}
                     </View>
-                    {email.length < 1 ? null : emailVerify ? null : (
-                        <Text style={{ margin: 10, color: "red", }}> Nhập sai định dạng Email </Text>
-                    )}
-
-
                 </View>
 
                 <View style={{ marginTop: 0 }}>
-                    <View
-                        style={styles.inputContainer}
-                    >
-                        <Entypo name="key" size={24}
-                            color="gray"
-                            style={{ marginLeft: 8 }} />
+                    <View>
+                        <View style={styles.inputContainer}>
+                            <Entypo name="key" size={24} color="gray" style={{ marginLeft: 8 }} />
+                            <TextInput
+                                onChangeText={handlePasswordChange}
 
-                        <TextInput
-                            value={password}
-                            onChangeText={(text) => setPassword(text)}
-                            secureTextEntry={!showPassword}
-                            style={styles.input}
-                            placeholder="Nhập Password"
-                        />
-                        <TouchableOpacity onPress={toggleShowPassword} style={{ right: 0, marginRight: 10 }}>
-                            <Entypo name={showPassword ? "eye" : "eye-with-line"} size={24} color="gray" />
-                        </TouchableOpacity>
+                                secureTextEntry={!showPassword}
+                                style={styles.input}
+                                placeholder="Nhập Password"
+                            />
+                            <TouchableOpacity onPress={toggleShowPassword} style={{ right: 0, marginRight: 10 }}>
+                                <Entypo name={showPassword ? "eye" : "eye-with-line"} size={24} color="gray" />
+                            </TouchableOpacity>
+                        </View>
+                        {passwordError && <Text style={{ color: 'red', marginTop: 5, }}>{passwordError}</Text>}
                     </View>
                 </View>
 
@@ -169,6 +176,7 @@ const LoginScreen = () => {
 
                 <Pressable
                     onPress={handleLogin}
+
                     style={styles.loginButton}
                 >
                     <Text

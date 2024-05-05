@@ -5,7 +5,17 @@ const OrderModel = require("../models/order.model");
 const {ObjectId } = require('mongodb');
 const ProductService = {
     //GET ALL PRODUCTS
-    async getProducts(req, res) {
+    async getProducts(page, size) {
+        try {
+            const startIndex = (page - 1) * size;
+            const products = await ProductModel.find().skip(startIndex).limit(size);
+            return products;
+        } catch (error) {
+            throw new Error("Không lấy được sản phẩm");
+        }
+    },   
+    //GET ALL PRODUCTS
+    async getAllProducts() {
         try {
             const products = await ProductModel.find();
             return products;
@@ -13,6 +23,7 @@ const ProductService = {
             throw new Error("Không lấy được sản phẩm");
         }
     },
+     
     //ADD PRODUCT
     async addProducts(payload) {
         const { title, Price, image, color, size, carouselImages, offer, category_id } = payload
@@ -35,18 +46,15 @@ const ProductService = {
 
     },
     //GET PRODUCT BY CATEGORY
-    async getProductsbycate(payload) {
-        const { category_id } = payload
+    async  getProductsbycate(categoryId) {
         try {
-            const products = await ProductModel.find({ category_id: new ObjectId(category_id) })
+            const products = await ProductModel.find({ category_id: categoryId }).exec();
             return products;
         } catch (error) {
             throw new Error("Không lấy được sản phẩm theo danh mục");
         }
     },
-
-
-
+    
     // ------------------category----------------------
 
     //ADD CATEGORY
@@ -71,6 +79,20 @@ const ProductService = {
             throw new Error("Không lấy được danh mục");
         }
     },
+    async getCategoryByName(name) {
+        try {
+            const category = await CategoriesModel.findOne({ name });
+            return category;
+        } catch (error) {
+            throw new Error("Không lấy được danh mục");
+        }
+    },
+
+
+
+
+
+
 
     // Get orders 
     async getOrders(user_id) {

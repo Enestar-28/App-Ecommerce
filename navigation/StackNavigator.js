@@ -12,7 +12,9 @@ import HomeScreen from '../screens/HomeScreen';
 import CartScreen from '../screens/CartScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import OrderScreen from '../screens/OrderScreen';
+import UpdateAddressesScreen from '../screens/UpdateAddressesScreen';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
+import ProductScreen from '../screens/ProductScreen';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +41,21 @@ const StackNavigator = () => {
                             ),
                     }}
                 />
+                 <Tab.Screen
+                    name="Cart"
+                    component={CartScreen}
+                    options={{
+                        tabBarLabel: "Cart",
+                        tabBarLabelStyle: { color: "#008E97" },
+                        headerShown: false,
+                        tabBarIcon: ({ focused }) =>
+                            focused ? (
+                                <Ionicons name="cart" size={24} color="#008E97" />
+                            ) : (
+                                <Ionicons name="cart-outline" size={24} color="black" />
+                            ),
+                    }}
+                />
 
                 <Tab.Screen
                     name="Profile"
@@ -55,21 +72,7 @@ const StackNavigator = () => {
                     }}
                 />
 
-                <Tab.Screen
-                    name="Cart"
-                    component={CartScreen}
-                    options={{
-                        tabBarLabel: "Cart",
-                        tabBarLabelStyle: { color: "#008E97" },
-                        headerShown: false,
-                        tabBarIcon: ({ focused }) =>
-                            focused ? (
-                                <Ionicons name="cart" size={24} color="#008E97" />
-                            ) : (
-                                <Ionicons name="cart-outline" size={24} color="black" />
-                            ),
-                    }}
-                />
+               
             </Tab.Navigator>
         );
     }
@@ -106,6 +109,18 @@ const StackNavigator = () => {
                     component={AddressScreen}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                    name="UpdateAddress"
+                    component={UpdateAddressesScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="ListProduct"
+                    component={ProductScreen}
+                    options={{ headerShown: false }}
+                />
+
+
                 <Stack.Screen
                     name="Confirm"
                     component={ConfirmationScreen}

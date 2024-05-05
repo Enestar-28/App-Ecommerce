@@ -4,7 +4,18 @@ require('dotenv').config()
 //get all product 
 
 const getproController = async (req, res) => {
-    const result = await ProductService.getProducts()
+    const {page , size } = req.query
+   
+    const result = await ProductService.getProducts(page , size)
+    return res.json({
+        message: 'get all products',
+        result
+    })
+}
+const getAllProController = async (req, res) => {
+    
+   
+    const result = await ProductService.getAllProducts()
     return res.json({
         message: 'get all products',
         result
@@ -23,17 +34,14 @@ const addproController = async (req, res) => {
 
 //get product by category
 const getprobycateController = async (req, res) => {
-    const result = await ProductService.getProductsbycate(req.body)
+    const {categoryId} = req.params
+    const result = await ProductService.getProductsbycate(categoryId)
     return res.json({
         message: 'get products by category',
         result
     })
 
 }
-
-
-
-
 
 
 
@@ -59,6 +67,15 @@ const getcatController = async (req, res) => {
     })
 }
 
+const getcatebynameController = async (req, res) => {
+    const {name} = req.body
+    const result = await ProductService.getCategoryByName(name)
+    return res.json({
+        message: 'get category by name',
+        result
+    })
+}   
+
 
 
 
@@ -76,7 +93,8 @@ const addorderController = async (req, res) => {
 }
 
 const getorderController = async (req, res) => {
-    const result = await ProductService.getOrders(req.params.user_id)
+    const {user_id} = req.query
+    const result = await ProductService.getOrders(user_id)
     return res.json({
         message: 'get all orders',
         result
@@ -96,6 +114,8 @@ module.exports = {
     getcatController,
     getprobycateController,
     addorderController,
-    getorderController
+    getorderController,
+    getAllProController,
+    getcatebynameController
 }
 

@@ -29,11 +29,11 @@ router.post('/register',  wrapAsync(registerController))
 router.get('/address/:user_id', wrapAsync(getAdressController))
 router.post('/address',wrapAsync(addressesController))
 router.put('/address', wrapAsync(updateAddressesController))
-router.post('/delete-address', wrapAsync(deleteAddressController))
+router.delete('/address', wrapAsync(deleteAddressController))
 
 
 
-router.get('/me/:userId', wrapAsync(meController))
+router.get('/me/:user_id', wrapAsync(meController))
 router.put('/me', wrapAsync(updateMeController))
 
 

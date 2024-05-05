@@ -19,12 +19,13 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 const CartScreen = () => {
+    const dispatch = useDispatch();
+    
     const cart = useSelector((state) => state.cart.cart);
     console.log(cart);
     const total = cart
         ?.map((item) => item.price * item.quantity)
         .reduce((curr, prev) => curr + prev, 0);
-    const dispatch = useDispatch();
     const increaseQuantity = (item) => {
         dispatch(incementQuantity(item));
     };
@@ -39,7 +40,7 @@ const CartScreen = () => {
         <ScrollView style={{ marginTop: 55, flex: 1, backgroundColor: "white" }}>
             <View
                 style={{
-                    backgroundColor: "#00CED1",
+                    backgroundColor: "#F6412E",
                     padding: 10,
                     flexDirection: "row",
                     alignItems: "center",
@@ -63,7 +64,7 @@ const CartScreen = () => {
                         size={22}
                         color="black"
                     />
-                    <TextInput placeholder="Search Amazon.in" />
+                    <TextInput placeholder="Tìm kiếm" />
                 </Pressable>
 
                 <Feather name="mic" size={24} color="black" />
@@ -73,7 +74,7 @@ const CartScreen = () => {
                 <Text style={{ fontSize: 18, fontWeight: "400" }}>Subtotal : </Text>
                 <Text style={{ fontSize: 20, fontWeight: "bold" }}>{total}</Text>
             </View>
-            <Text style={{ marginHorizontal: 10 }}>EMI details Available</Text>
+            <Text style={{ marginHorizontal: 10 }}></Text>
 
             <Pressable
                 onPress={() => navigation.navigate("Confirm")}
@@ -87,7 +88,7 @@ const CartScreen = () => {
                     marginTop: 10,
                 }}
             >
-                <Text>Proceed to Buy ({cart.length}) items</Text>
+                <Text>Mua hàng({cart.length}) items</Text>
             </Pressable>
 
             <Text
@@ -226,7 +227,7 @@ const CartScreen = () => {
                                     borderWidth: 0.6,
                                 }}
                             >
-                                <Text>Delete</Text>
+                                <Text>Xóa</Text>
                             </Pressable>
                         </Pressable>
 
@@ -248,7 +249,7 @@ const CartScreen = () => {
                                     borderWidth: 0.6,
                                 }}
                             >
-                                <Text>Save For Later</Text>
+                                <Text> Lưu lại sau </Text>
                             </Pressable>
 
                             <Pressable
@@ -261,7 +262,7 @@ const CartScreen = () => {
                                     borderWidth: 0.6,
                                 }}
                             >
-                                <Text>See More Like this</Text>
+                                <Text>Sản phẩm tương tự</Text>
                             </Pressable>
                         </Pressable>
                     </View>

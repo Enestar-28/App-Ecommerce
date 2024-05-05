@@ -1,201 +1,236 @@
 import {
-  Image,
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
+  Platform,
   ScrollView,
   Pressable,
+  TextInput,
+  Image, FlatList, ActivityIndicator
 } from "react-native";
-import React, { useLayoutEffect, useEffect, useContext, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
-import axios from "axios";
-import { UserType } from "../UserContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import ProductItem from "../components/ProductItem";
+import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import { useSelector, useDispatch } from 'react-redux';
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { BottomModal, SlideAnimation, ModalContent } from "react-native-modals";
+import { fetchProductsByCategory } from "../redux/product/ProductActions";
 
-const ProfileScreen = () => {
-  const { userId, setUserId } = useContext(UserType);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+
+const ProductScreen = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "",
-      headerStyle: {
-        backgroundColor: "#00CED1",
-      },
-      headerLeft: () => (
-        <Image
-          style={{ width: 140, height: 120, resizeMode: "contain" }}
-          source={{
-            uri: "https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c518.png",
-          }}
-        />
-      ),
-      headerRight: () => (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
-            marginRight: 12,
-          }}
-        >
-          <Ionicons name="notifications-outline" size={24} color="black" />
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAdress] = useState("");
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+  const { products } = useSelector((state) => state.products);
+  const route = useRoute();
+  console.log(products)
+  const { categoryId } = route.params;
+  console.log(categoryId);
+  useEffect(() => {
+    setAddresses(user?.addresses);
+    dispatch(fetchProductsByCategory({ categoryId }));
+  }, []);
 
-          <AntDesign name="search1" size={24} color="black" />
+  const renderFooter = () => {
+    return (
+        <View style={{ alignItems: 'center', marginTop: 10 }}>
+            <ActivityIndicator size="large" color="#888888" />
         </View>
-      ),
-    });
-  }, []);
-  const [user, setUser] = useState();
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get(
-          `http://192.168.1.42:8000/profile/${userId}`
-        );
-        const { user } = response.data;
-        setUser(user);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
+    );
+};
 
-    fetchUserProfile();
-  }, []);
-  const logout = () => {
-    clearAuthToken();
-  };
-  const clearAuthToken = async () => {
-    await AsyncStorage.removeItem("authToken");
-    console.log("auth token cleared");
-    navigation.replace("Login");
-  };
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(
-          `http://192.168.1.42:8000/orders/${userId}`
-        );
-        const orders = response.data.orders;
-        setOrders(orders);
 
-        setLoading(false);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
 
-    fetchOrders();
-  }, []);
-  console.log("orders", orders);
+
   return (
-    <ScrollView style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
-      <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-        Welcome {user?.name}
-      </Text>
+    <>
+      <SafeAreaView style={{ marginTop: 50, backgroundColor: "#fff" }}>
+        <ScrollView>
+          <View style={{ backgroundColor: "#F6412E", padding: 10, flexDirection: "row", alignItems: "center" }}>
+            <Pressable style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 7, gap: 10, backgroundColor: "white", borderRadius: 3, height: 38, flex: 1 }}>
+              <AntDesign style={{ paddingLeft: 10 }} name="search1" size={22} color="black" />
+              <TextInput placeholder="Tìm kiếm" />
+            </Pressable>
+            <Feather name="mic" size={24} color="black" />
+          </View>
+          <Pressable onPress={() => setModalVisible(!modalVisible)} style={{ flexDirection: "row", alignItems: "center", gap: 5, padding: 10, backgroundColor: "#FF6433" }}>
+            <Ionicons name="location-outline" size={24} color="black" />
+            <Pressable>
+              {selectedAddress ? (
+                <Text>Giao tới {selectedAddress?.name} - {selectedAddress?.street}</Text>
+              ) : (
+                <Text style={{ fontSize: 13, fontWeight: "500" }}>Thêm địa chỉ giao hàng</Text>
+              )}
+            </Pressable>
+            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+          </Pressable>
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          marginTop: 12,
-        }}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {products
+              .map((item, index) => (
+                
+                <ProductItem item={item} key={index} />
+              ))}
+          </View>
+
+        </ScrollView>
+        
+
+
+      </SafeAreaView>
+
+
+
+      <BottomModal
+        onBackdropPress={() => setModalVisible(!modalVisible)}
+        swipeDirection={["up", "down"]}
+        swipeThreshold={200}
+        modalAnimation={
+          new SlideAnimation({
+            slideFrom: "bottom",
+          })
+        }
+        onHardwareBackPress={() => setModalVisible(!modalVisible)}
+        visible={modalVisible}
+        onTouchOutside={() => setModalVisible(!modalVisible)}
       >
-        <Pressable
-          style={{
-            padding: 10,
-            backgroundColor: "#E0E0E0",
-            borderRadius: 25,
-            flex: 1,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>Your orders</Text>
-        </Pressable>
+        <ModalContent style={{ width: "100%", height: 400 }}>
+          <View style={{ marginBottom: 8 }}>
+            <Text style={{ fontSize: 16, fontWeight: "500" }}>
+              Chọn địa chỉ giao hàng
+            </Text>
 
-        <Pressable
-          style={{
-            padding: 10,
-            backgroundColor: "#E0E0E0",
-            borderRadius: 25,
-            flex: 1,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>Your Account</Text>
-        </Pressable>
-      </View>
+            <Text style={{ marginTop: 5, fontSize: 16, color: "gray" }}>
+              Chọn địa chỉ giao hàng hoặc thêm địa chỉ mới
+            </Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {/* already added addresses */}
+            {addresses?.map((item, index) => (
+              <Pressable
+                onPress={() => setSelectedAdress(item)}
+                style={{
+                  width: 140,
+                  height: 140,
+                  borderColor: "#D0D0D0",
+                  borderWidth: 1,
+                  padding: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 3,
+                  marginRight: 15,
+                  marginTop: 10,
+                  backgroundColor: selectedAddress === item ? "#FBCEB1" : "white"
+                }}
+              >
+                <View
+                  style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: "bold" }}>
+                    {item?.name}
+                  </Text>
+                  <Entypo name="location-pin" size={24} color="red" />
+                </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          marginTop: 12,
-        }}
-      >
-        <Pressable
-          style={{
-            padding: 10,
-            backgroundColor: "#E0E0E0",
-            borderRadius: 25,
-            flex: 1,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>Buy Again</Text>
-        </Pressable>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  {item?.houseNo},{item?.landmark}
+                </Text>
 
-        <Pressable
-          onPress={logout}
-          style={{
-            padding: 10,
-            backgroundColor: "#E0E0E0",
-            borderRadius: 25,
-            flex: 1,
-          }}
-        >
-          <Text style={{ textAlign: "center" }}>Logout</Text>
-        </Pressable>
-      </View>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  {item?.street}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  {item?.city} - {item?.country}
+                </Text>
+              </Pressable>
+            ))}
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : orders.length > 0 ? (
-          orders.map((order) => (
             <Pressable
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate("Address");
+              }}
               style={{
-                marginTop: 20,
-                padding: 15,
-                borderRadius: 8,
+                width: 140,
+                height: 140,
+                borderColor: "#D0D0D0",
+                marginTop: 10,
                 borderWidth: 1,
-                borderColor: "#d0d0d0",
-                marginHorizontal: 10,
+                padding: 10,
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              key={order._id}
             >
-              {/* Render the order information here */}
-              {order.products.slice(0, 1)?.map((product) => (
-                <View style={{ marginVertical: 10 }} key={product._id}>
-                  <Image
-                    source={{ uri: product.image }}
-                    style={{ width: 100, height: 100, resizeMode: "contain" }}
-                  />
-                </View>
-              ))}
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "#0066b2",
+                  fontWeight: "500",
+                }}
+              >
+                Thêm địa chỉ mới
+              </Text>
             </Pressable>
-          ))
-        ) : (
-          <Text>No orders found</Text>
-        )}
-      </ScrollView>
-    </ScrollView>
+          </ScrollView>
+          <View style={{ flexDirection: "column", gap: 7, marginBottom: 30 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Entypo name="location-pin" size={22} color="#0066b2" />
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Sử dụng địa chỉ mặc định
+              </Text>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Ionicons name="locate-sharp" size={22} color="#0066b2" />
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Sử dụng vị trí hiện tại
+              </Text>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <AntDesign name="earth" size={22} color="#0066b2" />
+
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Giao hàng đến quốc gia khác
+              </Text>
+            </View>
+          </View>
+        </ModalContent>
+      </BottomModal>
+    </>
   );
 };
 
-export default ProfileScreen;
+export default ProductScreen;
 
 const styles = StyleSheet.create({});

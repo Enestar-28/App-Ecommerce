@@ -6,6 +6,7 @@ require('dotenv').config()
 
 
 const loginController = async (req, res) => {
+    
     const result = await UserService.login(req.body)
     return res.json({
         message: 'User login',
@@ -48,8 +49,9 @@ const updateAddressesController = async (req, res) => {
 }
 
 const deleteAddressController = async (req, res) => {
-  
-    const result = await UserService.deleteAddress(req.body)
+    const { userId, addressId} = req.query
+    console.log('req.query', req.query)
+    const result = await UserService.deleteAddress(userId,addressId)
     return res.json({
         message: 'delete successful',
         result
@@ -58,8 +60,8 @@ const deleteAddressController = async (req, res) => {
 
 
 const meController = async (req, res) =>{
-    const {userId} = req.params
-    const result = await UserService.getme(userId)
+    const {user_id} = req.params
+    const result = await UserService.getme(user_id)
     return res.json({
         message: 'get me successful',
         result

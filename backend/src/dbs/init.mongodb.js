@@ -8,7 +8,7 @@ class Database {
 
     //connect to database mongodb
     connect(){
-        mongoose.connect(process.env.MONGO_URI)
+        mongoose.connect("mongodb+srv://admin:123@backendapp.xjldkui.mongodb.net/?retryWrites=true&w=majority&appName=backendapp")
         .then(() => {
             console.log('MongoDB connected')
         })

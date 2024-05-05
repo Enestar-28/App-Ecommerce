@@ -151,7 +151,7 @@ const ProductInfoScreen = () => {
                 </Text>
 
                 <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 6 }}>
-                    ${route?.params?.price}
+                    $99
                 </Text>
             </View>
 

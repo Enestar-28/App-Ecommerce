@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/CartReducer";
 
 const ProductItem = ({ item }) => {
   const [addedToCart, setAddedToCart] = useState(false);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const addItemToCart = (item) => {
     setAddedToCart(true);
@@ -14,7 +16,20 @@ const ProductItem = ({ item }) => {
     }, 60000);
   };
   return (
-    <Pressable style={{ marginHorizontal: 20, marginVertical: 25 }}>
+    <Pressable style={{ marginHorizontal: 20, marginVertical: 25 }}
+      onPress={() =>
+        navigation.navigate("Info", {
+          id: item.id,
+          title: item.title,
+          price: item?.price,
+          carouselImages: item.carouselImages,
+          color: item?.color,
+          size: item?.size,
+          oldPrice: item?.oldPrice,
+          item: item,
+        })
+      }>
+
       <Image
         style={{ width: 150, height: 150, resizeMode: "contain" }}
         source={{ uri: item?.image }}
@@ -32,16 +47,14 @@ const ProductItem = ({ item }) => {
           justifyContent: "space-between",
         }}
       >
-        <Text style={{ fontSize: 15, fontWeight: "bold" }}>₹{item?.price}</Text>
-        <Text style={{ color: "#FFC72C", fontWeight: "bold" }}>
-          {item?.rating?.rate} ratings
-        </Text>
+        <Text style={{ fontSize: 15, fontWeight: "bold" }}>$99</Text>
+       
       </View>
 
       <Pressable
         onPress={() => addItemToCart(item)}
         style={{
-          backgroundColor: "#FFC72C",
+          backgroundColor: "#F27259",
           padding: 10,
           borderRadius: 20,
           justifyContent: "center",
@@ -52,10 +65,10 @@ const ProductItem = ({ item }) => {
       >
         {addedToCart ? (
           <View>
-            <Text>Added to Cart</Text>
+            <Text>Đã thêm vào giỏ</Text>
           </View>
         ) : (
-          <Text>Add to Cart</Text>
+          <Text>Thêm vào giỏ</Text>
         )}
       </Pressable>
     </Pressable>

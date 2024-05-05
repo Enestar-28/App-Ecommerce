@@ -7,23 +7,25 @@ import {
     ScrollView,
     Pressable,
     TextInput,
-    Image,
+    Image, FlatList, ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { useSelector, useDispatch } from 'react-redux';
 import { AntDesign } from "@expo/vector-icons";
 import { SliderBox } from "react-native-image-slider-box";
 import axios from "axios";
 import ProductItem from "../components/ProductItem";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
 import { BottomModal, SlideAnimation, ModalContent } from "react-native-modals";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { fetchProductsRequest } from "../redux/product/ProductActions.js";
+import { fetchCategoriesRequest } from "../redux/categories/CategoriesActions.js";
+import { fetchUserRequest } from "../redux/user/UserActions.js";
 import { UserType } from "../UserContext";
 const HomeScreen = () => {
 
@@ -95,42 +97,61 @@ const HomeScreen = () => {
         },
     ];
 
-    const [products, setProducts] = useState([]);
-    const [categoies, setCategoies] = useState([]);
     const navigation = useNavigation();
     const [open, setOpen] = useState(false);
     const [addresses, setAddresses] = useState([]);
     const { userId, setUserId } = useContext(UserType);
     const [selectedAddress, setSelectedAdress] = useState("");
     const [category, setCategory] = useState("Nam");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(4);
+    const [isEndReachedCalled, setIsEndReachedCalled] = useState(false);
+    const dispatch = useDispatch();
+    const { products } = useSelector((state) => state.products);
+    const { categories } = useSelector((state) => state.categories);
+    const { user } = useSelector((state) => state.user);
 
-    const [items, setItems] = useState([
-        { label: "Điện tử", value: "Điện tử" },
-        { label: "Nam", value: "Nam" },
-        { label: "Nữ", value: "Nữ" },
-        { label: "Đồng hồ", value: "Đồng hồ" },
-    ]);
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("http://192.168.1.42:3333/api/v0/getproducts");
-                setProducts(response.data.result);
-
-            } catch (error) {
-                console.log("error message", error);
-            }
+        const fetchUser = async () => {
+            const userId = await AsyncStorage.getItem("UserId");
+            setUserId(userId);
         };
-        const categoiesData = async () => {
-            try {
-                const response = await axios.get("http://192.168.1.42:3333/api/v0/getcategoris");
-                setCategoies(response.data.result);
-            } catch (error) {
-                console.log("error message", error);
-            }
-        };
-        categoiesData();
-        fetchData();
+        fetchUser();
     }, []);
+
+    useEffect(() => {
+        // Gọi action fetchCategories để lấy danh sách các danh mục
+        dispatch(fetchCategoriesRequest());
+
+        // Gọi action fetchProducts để lấy danh sách sản phẩm
+        fetchProducts();
+
+    }, [dispatch]);
+
+
+
+
+    const fetchProducts = (loadMore = false) => {
+        dispatch(fetchProductsRequest({ page: currentPage, size: pageSize, loadMore: loadMore }));
+    };
+
+
+
+    const handleEndReached = () => {
+        // Nếu hàm đã được gọi và đang chờ 2 giây, không gọi lại
+        if (isEndReachedCalled) return
+        setIsEndReachedCalled(true); // Đánh dấu là hàm đã được gọi
+        setTimeout(() => {
+            handleLoadMore(); // Gọi hàm handleLoadMore sau 2 giây
+            setIsEndReachedCalled(false); // Đặt lại biến đếm sau khi đã gọi hàm
+        }, 1000); // Thời gian chờ 2 giây
+    };
+    const handleLoadMore = () => {
+        setCurrentPage(currentPage + 1);
+        console.log("currentPage", currentPage);
+        fetchProducts(true);
+    };
+
     const onGenderOpen = useCallback(() => {
         setCompanyOpen(false);
     }, []);
@@ -139,30 +160,18 @@ const HomeScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
     useEffect(() => {
         if (userId) {
-            fetchAddresses();
+            dispatch(fetchUserRequest(userId))
+            setAddresses(user?.addresses);
         }
-    }, [userId, modalVisible]);
-
-    const fetchAddresses = async () => {
-        try {
-            const response = await axios.get(
-                `http://192.168.1.42:3333/api/v0/address/${userId}`
-            );
-
-            const addresses = response.data.result;
-            setAddresses(addresses);
-        } catch (error) {
-            console.log("error", error);
-        }
+    }, [userId, modalVisible, dispatch]);
+    const renderFooter = () => {
+        return (
+            <View style={{ alignItems: 'center', marginTop: 10 }}>
+                <ActivityIndicator size="large" color="#888888" />
+            </View>
+        );
     };
-    useEffect(() => {
-        const fetchUser = async () => {
-            const userId = await AsyncStorage.getItem("UserId");
-            setUserId(userId);
-        };
 
-        fetchUser();
-    }, []);
 
     return (
         <>
@@ -214,54 +223,50 @@ const HomeScreen = () => {
                         }}
                     >
                         <Ionicons name="location-outline" size={24} color="black" />
-
                         <Pressable>
                             {selectedAddress ? (
                                 <Text>
-                                    Deliver to {selectedAddress?.name} - {selectedAddress?.street}
+                                    Giao tới {selectedAddress?.name} - {selectedAddress?.street}
                                 </Text>
                             ) : (
                                 <Text style={{ fontSize: 13, fontWeight: "500" }}>
-                                    Add a Address
+                                    Thêm địa chỉ giao hàng
                                 </Text>
                             )}
                         </Pressable>
-
                         <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
                     </Pressable>
 
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {categoies.map((item, index) => {
 
-                            return (
-                                <Pressable
-                                    key={index}
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {categories.map((item, index) => (
+                            <Pressable
+                                key={index}
+                                onPress={() => navigation.navigate('ListProduct', { categoryId: item._id })}
+                                style={{
+                                    margin: 10,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Image
+                                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                                    source={{ uri: item.image }}
+                                />
+                                <Text
                                     style={{
-                                        margin: 10,
-                                        justifyContent: "center",
-                                        alignItems: "center",
+                                        textAlign: "center",
+                                        fontSize: 12,
+                                        fontWeight: "500",
+                                        marginTop: 5,
                                     }}
                                 >
-                                    <Image
-                                        style={{ width: 50, height: 50, resizeMode: "contain" }}
-                                        source={{ uri: item.image }}
-                                    />
-
-                                    <Text
-                                        style={{
-                                            textAlign: "center",
-                                            fontSize: 12,
-                                            fontWeight: "500",
-                                            marginTop: 5,
-                                        }}
-                                    >
-                                        {item?.name}
-                                    </Text>
-                                </Pressable>
-                            );
-                        })}
-
+                                    {item?.name}
+                                </Text>
+                            </Pressable>
+                        ))}
                     </ScrollView>
+
 
                     <SliderBox
                         images={images}
@@ -393,52 +398,42 @@ const HomeScreen = () => {
                             marginBottom: open ? 50 : 15,
                         }}
                     >
-                        <DropDownPicker
-                            style={{
-                                borderColor: "#B7B7B7",
-                                height: 30,
-                                marginBottom: open ? 120 : 15,
-                            }}
-                            open={open}
-                            value={category} //genderValue
-                            items={items}
-                            setOpen={setOpen}
-                            setValue={setCategory}
-                            setItems={setItems}
-                            placeholder="choose category"
-                            placeholderStyle={styles.placeholderStyles}
-                            onOpen={onGenderOpen}
-                            // onChangeValue={onChange}
-                            zIndex={3000}
-                            zIndexInverse={1000}
-                        />
+
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            flexWrap: "wrap",
-                        }}
-                    >
-                        {products?.map((item, index) => (
-                            <ProductItem
-                                item={item}
+                    <FlatList
+                        data={products}
+                        renderItem={({ item, index }) => (
+                            <Pressable
                                 key={index}
                                 onPress={() =>
                                     navigation.navigate("Info", {
-                                        id: item._id,
+                                        id: item.id,
                                         title: item.title,
+                                        price: item?.price,
                                         carouselImages: item.carouselImages,
                                         color: item?.color,
                                         size: item?.size,
+                                        oldPrice: item?.oldPrice,
+                                        item: item,
                                     })
                                 }
-                            />
-                        ))}
-
-
-                    </View>
+                                style={{
+                                    margin: 10,
+                                    width: "45%",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <ProductItem item={item} />
+                            </Pressable>
+                        )}
+                        keyExtractor={(item, index) => index.toString()}
+                        numColumns={2} // Hiển thị 2 cột
+                        onEndReached={handleEndReached} // Gọi hàm khi cuộn đến cuối danh sách
+                        onEndReachedThreshold={0.1} // Khoảng cách từ cuối danh sách để gọi hàm
+                        ListFooterComponent={renderFooter && renderFooter()} // Render phần tử footer
+                    />
                 </ScrollView>
             </SafeAreaView>
 
@@ -510,7 +505,7 @@ const HomeScreen = () => {
                                     numberOfLines={1}
                                     style={{ width: 130, fontSize: 13, textAlign: "center" }}
                                 >
-                                    India, Bangalore
+                                    {item?.city} - {item?.country}
                                 </Text>
                             </Pressable>
                         ))}
@@ -538,7 +533,7 @@ const HomeScreen = () => {
                                     fontWeight: "500",
                                 }}
                             >
-                                Add an Address or pick-up point
+                                Thêm địa chỉ mới
                             </Text>
                         </Pressable>
                     </ScrollView>
@@ -583,4 +578,25 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    paginationContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 20,
+    },
+    loadMoreButton: {
+        marginHorizontal: 20,
+        backgroundColor: "white",
+        paddingVertical: 15, // Điều chỉnh độ cao của nút
+        paddingHorizontal: 30, // Điều chỉnh độ rộng của nút
+        borderRadius: 8, // Điều chỉnh độ cong của góc
+        borderWidth: 2, // Thêm viền
+        borderColor: "#ccc", // Màu viền
+    },
+    loadMoreButtonText: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: 18, // Điều chỉnh kích thước chữ
+    },
+});
+

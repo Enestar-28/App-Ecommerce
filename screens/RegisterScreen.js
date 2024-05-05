@@ -3,11 +3,13 @@ import {
     Text,
     View,
     SafeAreaView,
+    ScrollView,
     Pressable,
     Image,
     KeyboardAvoidingView,
     TextInput,
     Alert,
+    TouchableOpacity
 } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
@@ -16,46 +18,118 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { register } from '../redux/AuthReducer';
 
-import axios from 'axios';
+import { register } from '../redux/auth/AuthActions';
 
 const RegisterScreen = () => {
     const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState(null);
+    const [emailVerify, setEmailVerify] = useState(false);
     const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState(null);
+    const [touched, setTouched] = useState(false);
     const [name, setName] = useState('');
+    const [nameVerify, setNameVerify] = useState(false);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const [showPassword, setShowPassword] = useState(false);
+
+
+    const handleEmailChange = (text) => {
+        setEmail(text);
+        // Người dùng đã bắt đầu nhập
+        setTouched(true);
+        const errors = validateEmail(text);
+        setEmailError(errors.length > 0 ? errors[0] : null);
+    };
+
+    const validateEmail = (email) => {
+        const errors = [];
+
+        // Kiểm tra định dạng email
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.push('Email không hợp lệ');
+        }
+
+        return errors;
+    };
+
+    const handlePasswordChange = (text) => {
+        setPassword(text);
+        setTouched(true); // Người dùng đã bắt đầu nhập
+        const errors = validatePassword(text);
+        setPasswordError(errors.length > 0 ? errors[0] : null);
+    };
+
+
+    const toggleShowPassword = () => {
+        setShowPassword((prevShowPassword) => !prevShowPassword);
+    };
+
+
+    const validatePassword = (password) => {
+        const errors = [];
+
+        // Kiểm tra độ dài của mật khẩu
+        if (password.length < 8) {
+            errors.push('Mật khẩu phải có ít nhất 8 ký tự');
+        }
+
+        // Kiểm tra có ít nhất một số
+        if (!/\d/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một số');
+        }
+
+        // Kiểm tra có ít nhất một chữ cái viết hoa và một chữ cái viết thường
+        if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một chữ cái viết hoa và một chữ cái viết thường');
+        }
+
+        // Kiểm tra có ít nhất một ký tự đặc biệt
+        if (!/[^A-Za-z0-9]/.test(password)) {
+            errors.push('Mật khẩu phải chứa ít nhất một ký tự đặc biệt');
+        }
+
+        return errors;
+    };
+
+
+
+    const handleName = (value) => {
+        setName(value);
+        setNameVerify(false);
+        if (value.length >= 6) {
+            setName(value);
+            setNameVerify(true);
+        }
+    };
 
     const handleRegister = () => {
+        if (emailError) {
+            // Nếu còn lỗi mật khẩu, không thực hiện đăng ký
+            Alert.alert('Lỗi', 'Vui lòng nhập Email hợp lệ trước khi đăng ký.');
+            return;
+        }
+        if (passwordError) {
+            // Nếu còn lỗi mật khẩu, không thực hiện đăng ký
+            Alert.alert('Lỗi', 'Vui lòng nhập mật khẩu hợp lệ trước khi đăng ký.');
+            return;
+        }
         const user = {
             name: name,
             email: email,
             password: password,
         };
+        dispatch(register({ user}));
+        navigation.navigate("Login");    
 
-        axios
-            .post('http://192.168.1.42:3333/api/v0/register', user)
-            .then((response) => {
-                Alert.alert(
-                    'Đăng kí thành công',
-                    'Bạn đã đăng kí thành công, hãy đăng nhập để tiếp tục sử dụng dịch vụ'
-                );
-                
-                dispatch(register({ email: user.email}));
-                setName('');
-                setEmail('');
-                setPassword('');
-                navigation.navigate('Login');
-            })
-            .catch((error) => {
-                Alert.alert('Đăng kí lỗi', 'Lỗi xảy ra trong quá trình đăng kí tài khoản');
-                console.log('registration failed', error);
-            });
+
     };
 
     return (
         <SafeAreaView style={styles.container}>
+
+
             <View>
                 <Image
                     style={{ width: 150, height: 175 }}
@@ -71,7 +145,7 @@ const RegisterScreen = () => {
                         style={{
                             fontSize: 25,
                             fontWeight: 'bold',
-                            marginTop: 12,
+                            marginTop: 0,
                             marginBottom: 0,
                             color: '#041E42',
                         }}
@@ -80,7 +154,7 @@ const RegisterScreen = () => {
                     </Text>
                 </View>
 
-                <View style={{ marginTop: 70 }}>
+                <View style={{ marginTop: 30 }}>
                     <View style={styles.inputContainer}>
                         <FontAwesome name="user" size={24} color="gray" style={{ marginLeft: 8 }} />
                         <TextInput
@@ -93,38 +167,35 @@ const RegisterScreen = () => {
                         />
                     </View>
 
-                    <View style={styles.inputContainer}>
-                        <MaterialIcons
-                            style={{ marginLeft: 8 }}
-                            name="email"
-                            size={24}
-                            color="gray"
-                        />
-
-                        <TextInput
-                            value={email}
-                            onChangeText={(text) => setEmail(text)}
-                            style={styles.input}
-                            placeholder="Nhập Email"
-                        />
+                    <View>
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons name="email" size={24} color="gray" style={{ marginLeft: 8 }} />
+                            <TextInput
+                                value={email}
+                                onChangeText={handleEmailChange}
+                                style={styles.input}
+                                placeholder="Nhập Email"
+                            />
+                        </View>
+                        {emailError && <Text style={{ color: 'red', marginTop: 5 }}>{emailError}</Text>}
                     </View>
                 </View>
 
                 <View>
                     <View style={styles.inputContainer}>
-                        <Entypo name="key" size={24}
-                            color="gray"
-                            style={{ marginLeft: 8 }} />
-
-
+                        <Entypo name="key" size={24} color="gray" style={{ marginLeft: 8 }} />
                         <TextInput
-                            value={password}
-                            onChangeText={(text) => setPassword(text)}
-                            secureTextEntry={true}
+                            onChangeText={handlePasswordChange}
+
+                            secureTextEntry={!showPassword}
                             style={styles.input}
                             placeholder="Nhập Password"
                         />
+                        <TouchableOpacity onPress={toggleShowPassword} style={{ right: 0, marginRight: 10 }}>
+                            <Entypo name={showPassword ? "eye" : "eye-with-line"} size={24} color="gray" />
+                        </TouchableOpacity>
                     </View>
+                    {passwordError && <Text style={{ color: 'red', marginTop: 5, }}>{passwordError}</Text>}
                 </View>
 
                 <View
@@ -152,7 +223,7 @@ const RegisterScreen = () => {
                     </Text>
                 </Pressable>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
 

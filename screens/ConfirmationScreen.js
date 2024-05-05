@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Pressable,Alert } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Pressable, Alert } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { UserType } from "../UserContext";
@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { cleanCart } from "../redux/CartReducer";
 import { useNavigation } from "@react-navigation/native";
 import RazorpayCheckout from "react-native-razorpay";
+import { API_BASE_URL } from '@env';
+
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -30,7 +32,7 @@ const ConfirmationScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.42:3333/api/v0/address/${userId}`
+        `${API_BASE_URL}address/${userId}`
       );
       const addresses = response.data.result;
 
@@ -53,12 +55,13 @@ const ConfirmationScreen = () => {
         paymentMethod: selectedOption,
       };
 
-      console.log("orderData", orderData);
+      const url = `${API_BASE_URL}/orders`;
 
       const response = await axios.post(
-        "http://192.168.1.42:3333/api/v0/orders",
+        "http://192.168.243.18:3333/api/v0/orders",
         orderData
       );
+    
       if (response.status === 200) {
         navigation.navigate("Order");
         dispatch(cleanCart());
@@ -99,7 +102,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        "http://192.168.1.42:3333/api/v0/orders",
+        "http://192.168.243.18:3333/api/v0/orders",
         orderData
       );
       if (response.status === 200) {

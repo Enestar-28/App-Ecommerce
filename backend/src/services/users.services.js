@@ -45,7 +45,8 @@ let UserService = {
 
     // LOGIN
     login: async (payload) => {
-        const { email, password } = payload;
+        const { email, password } = payload
+        
 
         const user = await usersModel.findOne({ email: email });
         if (!user) {
@@ -135,32 +136,41 @@ let UserService = {
             throw new Error("Không thể cập nhật địa chỉ ");
         }
     },
-    deleteAddress: async (payload) => {
+    deleteAddress: async (userId, addressId) => {
         try {
-            const { user_id, address_id } = payload
-            const user = await usersModel.findOne({ _id: user_id })
+            const user = await usersModel.findOne({ _id: userId });
             if (!user) {
                 throw new Error("Không tìm thấy người dùng");
             }
-            const address = user.addresses.id(address_id);
-            if (!address) {
+            
+            // Tìm địa chỉ dựa trên address_id
+            const foundAddress = user.addresses.find(address => address._id.toString() === addressId.toString());
+            if (!foundAddress) {
                 throw new Error("Không tìm thấy địa chỉ");
             }
-            // Remove the address from the addresses array
-            address.remove();
-            // Save the updated user document
+            
+            // Lấy index của địa chỉ trong mảng addresses
+            const addressIndex = user.addresses.findIndex(address => address._id.toString() === addressId.toString());
+            
+            // Xóa địa chỉ khỏi mảng addresses của người dùng
+            user.addresses.splice(addressIndex, 1);
+            
+            // Lưu tài liệu người dùng đã được cập nhật
             await user.save();
-           
+            
+            console.log("Địa chỉ đã được xóa thành công");
         } catch (error) {
-            console.error("Error deleting address:", error);
+            console.error("Lỗi khi xóa địa chỉ:", error);
             throw new Error("Không thể xóa địa chỉ");
         }
     },
+    
 
     // get profie 
-    getme: async (userId) => {
+    getme: async (user_id) => {
         try {
-            const user = await usersModel.findOne({ _id: userId })
+            const user = await usersModel.findOne({ _id: user_id })
+            console.log('user', user)
             return user
         } catch (err) {
            throw new Error("Không tìm thấy người dùng");
@@ -177,7 +187,6 @@ let UserService = {
 
             })
             return user
-
         }
         catch (err) {
             throw new Error("Không thể cập nhật thông tin");
