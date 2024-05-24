@@ -83,7 +83,6 @@ const ProductScreen = () => {
           >
             {products
               .map((item, index) => (
-                
                 <ProductItem item={item} key={index} />
               ))}
           </View>

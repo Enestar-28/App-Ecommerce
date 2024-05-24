@@ -1,14 +1,14 @@
 const {
-    getproController,
-    addproController,
-    addcatController,
-    getcatController,
-    getprobycateController,
-    addorderController,
-    getorderController,
-    getAllProController,
-    getcatebynameController
-} = require('../controllers/products.controller')
+  getproController,
+  addproController,
+  addcatController,
+  getcatController,
+  getprobycateController,
+  addorderController,
+  getorderController,
+  getAllProController,
+  getcatebynameController,
+} = require("../controllers/products.controller");
 
 
 const express = require('express')

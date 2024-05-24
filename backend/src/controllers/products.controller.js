@@ -4,9 +4,8 @@ require('dotenv').config()
 //get all product 
 
 const getproController = async (req, res) => {
-    const {page , size } = req.query
-   
-    const result = await ProductService.getProducts(page , size)
+    const {page , size, keyword } = req.query
+    const result = await ProductService.getProducts(page, size, keyword);
     return res.json({
         message: 'get all products',
         result
@@ -42,6 +41,7 @@ const getprobycateController = async (req, res) => {
     })
 
 }
+
 
 
 
@@ -108,14 +108,15 @@ const getorderController = async (req, res) => {
 
 //get product by id
 module.exports = {
-    getproController,
-    addproController,
-    addcatController,
-    getcatController,
-    getprobycateController,
-    addorderController,
-    getorderController,
-    getAllProController,
-    getcatebynameController
-}
+  getproController,
+  addproController,
+  addcatController,
+  getcatController,
+  getprobycateController,
+  addorderController,
+  getorderController,
+  getAllProController,
+  getcatebynameController,
+  getproController,
+};
 

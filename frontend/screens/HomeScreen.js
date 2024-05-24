@@ -108,6 +108,7 @@ const HomeScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(4);
   const [isEndReachedCalled, setIsEndReachedCalled] = useState(false);
+  const [keyword, setKeyword] = useState("");
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.categories);
@@ -174,6 +175,11 @@ const HomeScreen = () => {
     );
   };
 
+  const handleSearch = () => {
+    console.log("keyword", keyword);
+    navigation.navigate("ListProduct", { keyword: keyword });
+   };
+
   return (
     <>
       <SafeAreaView
@@ -200,14 +206,19 @@ const HomeScreen = () => {
                 height: 38,
                 flex: 1,
               }}
-            >
+              >
               <AntDesign
                 style={{ paddingLeft: 10 }}
                 name="search1"
                 size={22}
                 color="black"
+                onPress={handleSearch}
+                />
+              <TextInput
+                placeholder="Tìm kiếm"
+                value={keyword}
+                onChangeText={setKeyword}
               />
-              <TextInput placeholder="Tìm kiếm" />
             </Pressable>
 
             <Feather name="mic" size={24} color="black" />
