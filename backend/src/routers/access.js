@@ -18,7 +18,7 @@ const router = express.Router()
 
 
 
-router.post('/login',loginValidator, wrapAsync(loginController))
+router.post('/login', wrapAsync(loginController))
 router.post('/register',  wrapAsync(registerController))
 
 // //log out 

@@ -6,7 +6,7 @@ require('dotenv').config()
 
 
 const loginController = async (req, res) => {
-    
+    console.log('req.body', req.body)
     const result = await UserService.login(req.body)
     return res.json({
         message: 'User login',
