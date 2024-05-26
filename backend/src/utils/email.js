@@ -1,5 +1,5 @@
-userModel = require('../models/user.model');
-
+const userModel = require('../models/user.model');
+const nodemailer = require("nodemailer");
 
 const checkEmails = async (email) => {
 
@@ -11,6 +11,19 @@ const checkEmails = async (email) => {
         }
 }
 
-module.exports = { 
-    checkEmails 
-}
+
+const sendEmail = async (email, subject, text) => {
+  const mailOptions = {
+    from: "phamtrungnguyenvx99@gmail.com",
+    to: email,
+    subject: subject,
+    html: text,
+  };
+  await transporter.sendMail(mailOptions);
+};
+ 
+
+module.exports = {
+  checkEmails,
+  sendEmail,
+};

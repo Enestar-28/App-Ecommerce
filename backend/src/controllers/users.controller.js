@@ -77,14 +77,39 @@ const updateMeController = async (req, res) =>{
     })
 }
 
+const forgotPassController = async (req, res) => {
+    const result = await UserService.forgotPass(req.body)
+    return res.json({
+        message: 'forgot password',
+        result
+    })
+}
+const resetPassController = async (req, res) => {
+    const result = await UserService.resetPass(req.body)
+    return res.json({
+        message: 'reset password',
+        result
+    })
+}
+
+const changePasswordController = async (req, res) => {
+    const result = await UserService.changePassword(req.body)
+    return res.json({
+        message: 'change password',
+        result
+    })
+}
 
 module.exports = {
-    loginController,
-    registerController,
-    addressesController,
-    meController,
-    getAdressController,
-    updateAddressesController,
-    deleteAddressController,
-    updateMeController
-}
+  loginController,
+  registerController,
+  addressesController,
+  meController,
+  getAdressController,
+  updateAddressesController,
+  deleteAddressController,
+  updateMeController,
+  forgotPassController,
+  resetPassController,
+  changePasswordController,
+};
