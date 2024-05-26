@@ -9,20 +9,16 @@ import {
   TextInput,
   Pressable,
   Alert,
-  TouchableOpacity,
 } from "react-native";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { login } from "../redux/auth/AuthActions.js";
+import { forgetRequest, login } from "../redux/auth/AuthActions";
 
 const ForgetScreen = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(null);
+  const dispatch = useDispatch();
+  const [touched, setTouched] = useState(false);
   const navigation = useNavigation();
 
   const handleEmailChange = (text) => {
@@ -40,6 +36,16 @@ const ForgetScreen = () => {
       errors.push("Email không hợp lệ");
     }
     return errors;
+  };
+
+  const handleFoget = () => {
+    if (emailError) {
+      Alert.alert("Lỗi", "Vui lòng nhập Email đúng định dạng.");
+      return;
+    }
+    const user = { email };
+
+    dispatch(forgetRequest({ user, navigation }));
   };
 
   return (
@@ -86,10 +92,7 @@ const ForgetScreen = () => {
 
         <View style={{ marginTop: 80 }} />
 
-        <Pressable
-          onPress={() => navigation.navigate("ChangePassword")}
-          style={styles.loginButton}
-        >
+        <Pressable onPress={handleFoget} style={styles.loginButton}>
           <Text style={styles.loginButtonText}>Gửi mã</Text>
         </Pressable>
       </KeyboardAvoidingView>

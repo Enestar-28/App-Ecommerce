@@ -32,7 +32,7 @@ const ProductScreen = () => {
   const { user } = useSelector((state) => state.user);
   const { products } = useSelector((state) => state.products);
   const route = useRoute();
-  console.log(products)
+
   const { categoryId } = route.params;
   console.log(categoryId);
   useEffect(() => {

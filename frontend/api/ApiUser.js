@@ -22,6 +22,27 @@ export const register = async (user) => {
     }
 }
 
+export const forgetPassword = async (user) => {
+    try {   
+        const email = { email: user.email };
+        
+        const response = await axios.post(`${API_BASE_URL}/forgot-password`, email);
+        return response.data.result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const rePassword = async (user) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/reset-password`, user);
+        
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 

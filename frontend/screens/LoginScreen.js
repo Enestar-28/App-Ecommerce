@@ -71,7 +71,8 @@ const LoginScreen = () => {
     // Kiểm tra có ít nhất một chữ cái viết hoa và một chữ cái viết thường
     if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
       errors.push(
-        "Mật khẩu phải chứa ít nhất một chữ cái viết hoa và một chữ cái viết thường"
+        `Mật khẩu phải chứa ít nhất một chữ cái viết hoa 
+và một chữ cái viết thường`
       );
     }
     // Kiểm tra có ít nhất một ký tự đặc biệt
@@ -231,6 +232,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: 300,
     fontSize: 16,
+    marginLeft: 5,
   },
   forgotPassword: {
     color: "#007FFF",

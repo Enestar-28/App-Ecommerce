@@ -1,4 +1,10 @@
-import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_REGISTER }  from '../../constants/constants.js';
+import {
+  AUTH_LOGIN,
+  AUTH_LOGOUT,
+  AUTH_REGISTER,
+  AUTH_FORGET_PASSWORD,
+  AUTH_CHANGE_PASSWORD,
+} from "../../constants/constants.js";
 
 
  const initialState = {
@@ -13,15 +19,26 @@ const authReducer = (state = initialState, action) => {
         ...state,
         user: action.payload,
         isAuthenticated: true,
-        
       };
     case AUTH_LOGOUT:
-      return { 
+      return {
         ...state,
         user: null,
         isAuthenticated: false,
       };
     case AUTH_REGISTER:
+      return {
+        ...state,
+        user: action.payload,
+        isAuthenticated: true,
+      };
+    case AUTH_FORGET_PASSWORD:
+      return {
+        ...state,
+        user: action.payload,
+        isAuthenticated: true,
+      };
+    case AUTH_CHANGE_PASSWORD:
       return {
         ...state,
         user: action.payload,

@@ -11,91 +11,58 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-
-import { MaterialIcons } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { navigateToLogin } from "../navigation/navigationHelpers";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { login } from "../redux/auth/AuthActions.js";
+import { changePasswordRequest } from "../redux/auth/AuthActions";
 
 const ChangePassScreen = () => {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState(null);
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState(null);
-  const [touched, setTouched] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [showPassword, setShowPassword] = useState(false);
+  const route = useRoute();
+  const { email } = route.params;
 
-  const handleEmailChange = (text) => {
-    setEmail(text);
-    // Người dùng đã bắt đầu nhập
-    setTouched(true);
-    const errors = validateEmail(text);
-    setEmailError(errors.length > 0 ? errors[0] : null);
-  };
-
-  const validateEmail = (email) => {
-    const errors = [];
-    // Kiểm tra định dạng email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.push("Email không hợp lệ");
-    }
-    return errors;
-  };
-
-  const handlePasswordChange = (text) => {
-    setPassword(text);
-    setTouched(true); // Người dùng đã bắt đầu nhập
+  const handleNewPasswordChange = (text) => {
+    setNewPassword(text);
     const errors = validatePassword(text);
     setPasswordError(errors.length > 0 ? errors[0] : null);
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
-  };
-
   const validatePassword = (password) => {
     const errors = [];
-    // Kiểm tra độ dài của mật khẩu
     if (password.length < 8) {
       errors.push("Mật khẩu phải có ít nhất 8 ký tự");
     }
-    // Kiểm tra có ít nhất một số
     if (!/\d/.test(password)) {
       errors.push("Mật khẩu phải chứa ít nhất một số");
     }
-    // Kiểm tra có ít nhất một chữ cái viết hoa và một chữ cái viết thường
     if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
       errors.push(
-        "Mật khẩu phải chứa ít nhất một chữ cái viết hoa và một chữ cái viết thường"
+        `Mật khẩu phải chứa ít nhất một chữ cái viết hoa 
+và một chữ cái viết thường`
       );
     }
-    // Kiểm tra có ít nhất một ký tự đặc biệt
     if (!/[^A-Za-z0-9]/.test(password)) {
       errors.push("Mật khẩu phải chứa ít nhất một ký tự đặc biệt");
     }
     return errors;
   };
 
-  const handleLogin = () => {
-    if (emailError) {
-      Alert.alert("Lỗi", "Vui lòng nhập Email hợp lệ trước khi đăng nhập.");
-      return;
-    }
+  const handleChangePassword = () => {
     if (passwordError) {
       Alert.alert("Lỗi", "Vui lòng nhập mật khẩu hợp lệ trước khi đăng nhập.");
       return;
     }
     const user = {
+      code: code,
       email: email,
-      password: password,
+      newPassword: newPassword,
     };
     console.log("user", user);
-    dispatch(login({ user, navigation }));
+    dispatch(changePasswordRequest({ user, navigation }));
   };
 
   return (
@@ -109,47 +76,44 @@ const ChangePassScreen = () => {
 
       <KeyboardAvoidingView>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles.loginText}>Lấy lại mật khẩu</Text>
+          <Text style={styles.loginText}>Đổi mật khẩu</Text>
         </View>
 
-        <View style={{ marginTop: 70 }}>
-          <View>
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={email}
-                onChangeText={handleEmailChange}
-                style={styles.input}
-                placeholder="Nhập Email"
-              />
-            </View>
-            {emailError && (
-              <Text style={{ color: "red", marginTop: 5 }}>{emailError}</Text>
-            )}
+        <View style={{ marginTop: 50 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={code}
+              onChangeText={setCode}
+              style={styles.input}
+              placeholder="Nhập code"
+            />
           </View>
-        </View>
-        <View
-          style={{
-            marginTop: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ marginLeft: 7 }}>
-            Nhấn gửi để nhận mã xác nhận email
-          </Text>
-        </View>
 
-        <View style={{ marginTop: 80 }} />
-
-        <Pressable onPress={handleLogin} style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Gửi mã</Text>
-        </Pressable>
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={newPassword}
+              onChangeText={handleNewPasswordChange}
+              style={styles.input}
+              placeholder="Nhập mật khẩu mới"
+              secureTextEntry={true}
+            />
+          </View>
+          {passwordError && (
+            <Text style={{ color: "red", marginTop: 5 }}>{passwordError}</Text>
+          )}
+        </View>
 
         <Pressable
-          onPress={() => navigation.navigate("ChangePassword")}
+          onPress={() => navigation.navigate("Login")}
           style={{ marginTop: 15 }}
-        ></Pressable>
+        >
+          <Text>Q</Text>
+        </Pressable>
+        <View style={{ marginTop: 80 }} />
+
+        <Pressable onPress={handleChangePassword} style={styles.loginButton}>
+          <Text style={styles.loginButtonText}>Gửi mã</Text>
+        </Pressable>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

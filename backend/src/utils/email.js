@@ -1,16 +1,28 @@
-const userModel = require('../models/user.model');
+const userModel = require("../models/user.model");
 const nodemailer = require("nodemailer");
 
+// Initialize nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "phamtrungnguyenvx99@gmail.com",
+    pass: "jquv uecu futl rocg",
+  },
+});
+
 const checkEmails = async (email) => {
-
-    const existingUser = await userModel.findOne({email: email});
+  try {
+    const existingUser = await userModel.findOne({ email: email });
     if (existingUser) {
-        return res.status(400).json({ message: "Email đã tồn tại" });
-    }else{
-        return email
-        }
-}
-
+      throw new Error("Email đã tồn tại");
+    }
+    return email;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const sendEmail = async (email, subject, text) => {
   const mailOptions = {
@@ -19,9 +31,12 @@ const sendEmail = async (email, subject, text) => {
     subject: subject,
     html: text,
   };
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
 };
- 
 
 module.exports = {
   checkEmails,

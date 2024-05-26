@@ -1,12 +1,18 @@
-export const AUTH_LOGIN = 'auth/login';
-export const LOGIN_SUCCESS = 'auth/login/success';
-export const LOGIN_SUCCESS_NAVIGATE = 'auth/login/success/navigate';
-export const AUTH_LOGOUT = 'auth/logout';
-export const LOGOUT_SUCCESS = 'auth/logout/success';
-export const AUTH_REGISTER = 'auth/register';
-export const REGISTER_REQUEST = 'auth/register/request';
-export const REGISTER_SUCCESS = 'auth/register/success';
-export const REGISTER_FAILURE = 'auth/register/failure';
+export const AUTH_LOGIN = 'AUTH_LOGIN';
+export const LOGIN_SUCCESS = 'AUTH_LOGIN_SUCCESS';
+export const LOGIN_SUCCESS_NAVIGATE = 'AUTH_LOGIN_SUCCESS_NAVIGATE';
+export const AUTH_LOGOUT = 'AUTH_LOGOUT';
+export const LOGOUT_SUCCESS = 'AUTH_LOGOUT_SUCCESS';
+export const AUTH_REGISTER = 'AUTH_REGISTER';
+export const REGISTER_REQUEST = 'AUTH_REGISTER_REQUEST';
+export const REGISTER_SUCCESS = 'AUTH_REGISTER_SUCCESS';
+export const REGISTER_FAILURE = 'AUTH_REGISTER_FAILURE';
+export const AUTH_FORGET_PASSWORD = 'AUTH_FORGET_PASSWORD';
+export const FORGET_PASSWORD_SUCCESS = 'AUTH_FORGET_PASSWORD_SUCCESS';
+export const FORGET_PASSWORD_FAILURE = 'AUTH_FORGET_PASSWORD_FAILURE';
+export const AUTH_CHANGE_PASSWORD = 'AUTH_CHANGE_PASSWORD';
+export const CHANGE_PASSWORD_SUCCESS = 'AUTH_CHANGE_PASSWORD_SUCCESS';
+export const CHANGE_PASSWORD_FAILURE = 'AUTH_CHANGE_PASSWORD_FAILURE';
 
 
 

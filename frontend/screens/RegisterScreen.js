@@ -82,7 +82,10 @@ const RegisterScreen = () => {
 
         // Kiểm tra có ít nhất một chữ cái viết hoa và một chữ cái viết thường
         if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
-            errors.push('Mật khẩu phải chứa ít nhất một chữ cái viết hoa và một chữ cái viết thường');
+            errors.push(
+              `Mật khẩu phải chứa ít nhất một chữ cái viết hoa 
+và một chữ cái viết thường`
+            );
         }
 
         // Kiểm tra có ít nhất một ký tự đặc biệt
@@ -126,103 +129,132 @@ const RegisterScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <View>
+          <Image
+            style={{ width: 150, height: 175 }}
+            source={require("../assets/image/login1.jpg")}
+          />
+        </View>
 
+        <KeyboardAvoidingView>
+          <View style={{ alignItems: "center" }}>
+            <Text
+              style={{
+                fontSize: 25,
+                fontWeight: "bold",
+                marginTop: 0,
+                marginBottom: 0,
+                color: "#041E42",
+              }}
+            >
+              Đăng kí tài khoản
+            </Text>
+          </View>
 
-            <View>
-                <Image
-                    style={{ width: 150, height: 175 }}
-                    source={{
-                        uri: 'https://images.creativemarket.com/0.1.0/ps/12582373/1200/799/m1/fpnw/wm0/nq-logo-designs-(2)-.jpg?1655371491&s=71428269453e63ca71c0dc8ea3ae5350',
-                    }}
-                />
+          <View style={{ marginTop: 30 }}>
+            <View style={styles.inputContainer}>
+              <FontAwesome
+                name="user"
+                size={24}
+                color="gray"
+                style={{ marginLeft: 8 }}
+              />
+              <TextInput
+                value={name}
+                onChangeText={(text) => setName(text)}
+                style={styles.input}
+                placeholder="Nhập tên"
+              />
             </View>
 
-            <KeyboardAvoidingView>
-                <View style={{ alignItems: 'center' }}>
-                    <Text
-                        style={{
-                            fontSize: 25,
-                            fontWeight: 'bold',
-                            marginTop: 0,
-                            marginBottom: 0,
-                            color: '#041E42',
-                        }}
-                    >
-                        Đăng kí tài khoản
-                    </Text>
-                </View>
+            <View>
+              <View style={styles.inputContainer}>
+                <MaterialIcons
+                  name="email"
+                  size={24}
+                  color="gray"
+                  style={{ marginLeft: 8 }}
+                />
+                <TextInput
+                  value={email}
+                  onChangeText={handleEmailChange}
+                  style={styles.input}
+                  placeholder="Nhập Email"
+                />
+              </View>
+              {emailError && (
+                <Text style={{ color: "red", marginTop: 5 }}>{emailError}</Text>
+              )}
+            </View>
+          </View>
 
-                <View style={{ marginTop: 30 }}>
-                    <View style={styles.inputContainer}>
-                        <FontAwesome name="user" size={24} color="gray" style={{ marginLeft: 8 }} />
-                        <TextInput
+          <View>
+            <View style={styles.inputContainer}>
+              <Entypo
+                name="key"
+                size={24}
+                color="gray"
+                style={{ marginLeft: 8 }}
+              />
+              <TextInput
+                onChangeText={handlePasswordChange}
+                secureTextEntry={!showPassword}
+                style={styles.input}
+                placeholder="Nhập Password"
+              />
+              <TouchableOpacity
+                onPress={toggleShowPassword}
+                style={{ right: 0, marginRight: 10 }}
+              >
+                <Entypo
+                  name={showPassword ? "eye" : "eye-with-line"}
+                  size={24}
+                  color="gray"
+                />
+              </TouchableOpacity>
+            </View>
+            {passwordError && (
+              <Text style={{ color: "red", marginTop: 5 }}>
+                {passwordError}
+              </Text>
+            )}
+          </View>
 
+          <View
+            style={{
+              marginTop: 12,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text>Chúc bạn một ngày tốt lành</Text>
 
-                            value={name}
-                            onChangeText={(text) => setName(text)}
-                            style={styles.input}
-                            placeholder="Nhập tên"
-                        />
-                    </View>
+            <Text
+              style={styles.forgotPasswordText}
+              onPress={() => navigation.navigate("Forget")}
+            >
+              Quên mật khẩu
+            </Text>
+          </View>
 
-                    <View>
-                        <View style={styles.inputContainer}>
-                            <MaterialIcons name="email" size={24} color="gray" style={{ marginLeft: 8 }} />
-                            <TextInput
-                                value={email}
-                                onChangeText={handleEmailChange}
-                                style={styles.input}
-                                placeholder="Nhập Email"
-                            />
-                        </View>
-                        {emailError && <Text style={{ color: 'red', marginTop: 5 }}>{emailError}</Text>}
-                    </View>
-                </View>
+          <View style={{ marginTop: 80 }} />
 
-                <View>
-                    <View style={styles.inputContainer}>
-                        <Entypo name="key" size={24} color="gray" style={{ marginLeft: 8 }} />
-                        <TextInput
-                            onChangeText={handlePasswordChange}
+          <Pressable onPress={handleRegister} style={styles.registerButton}>
+            <Text style={styles.registerButtonText}>Đăng kí</Text>
+          </Pressable>
 
-                            secureTextEntry={!showPassword}
-                            style={styles.input}
-                            placeholder="Nhập Password"
-                        />
-                        <TouchableOpacity onPress={toggleShowPassword} style={{ right: 0, marginRight: 10 }}>
-                            <Entypo name={showPassword ? "eye" : "eye-with-line"} size={24} color="gray" />
-                        </TouchableOpacity>
-                    </View>
-                    {passwordError && <Text style={{ color: 'red', marginTop: 5, }}>{passwordError}</Text>}
-                </View>
-
-                <View
-                    style={{
-                        marginTop: 12,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <Text>Chúc bạn một ngày tốt lành</Text>
-
-                    <Text style={styles.forgotPasswordText}>Quên mật khẩu</Text>
-                </View>
-
-                <View style={{ marginTop: 80 }} />
-
-                <Pressable onPress={handleRegister} style={styles.registerButton}>
-                    <Text style={styles.registerButtonText}>Đăng kí</Text>
-                </Pressable>
-
-                <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 15 }}>
-                    <Text style={styles.signInText}>
-                        Bạn đã có tài khoản? Đăng nhập
-                    </Text>
-                </Pressable>
-            </KeyboardAvoidingView>
-        </SafeAreaView >
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 15 }}
+          >
+            <Text style={styles.signInText}>
+              Bạn đã có tài khoản? Đăng nhập
+            </Text>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
 };
 

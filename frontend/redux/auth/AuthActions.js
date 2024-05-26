@@ -8,6 +8,12 @@ import {
   REGISTER_SUCCESS,
   REGISTER_FAILURE,
   LOGIN_SUCCESS_NAVIGATE,
+  AUTH_FORGET_PASSWORD,
+  FORGET_PASSWORD_SUCCESS,
+  FORGET_PASSWORD_FAILURE,
+  AUTH_CHANGE_PASSWORD,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_FAILURE,
 } from "../../constants/constants.js";
 
 export const login = (user) => ({
@@ -19,13 +25,6 @@ export const loginSuccess = (user) => ({
   type: LOGIN_SUCCESS,
   payload: user,
 });
-
-
-export const loginSuccessNavigate = (user, navigation) => ({
-  type: LOGIN_SUCCESS_NAVIGATE,
-  payload: { user, navigation },
-});
-
 
 export const logout = () => ({
   type: AUTH_LOGOUT,
@@ -52,3 +51,36 @@ export const registerSuccess = () => ({
 export const registerFailure = () => ({
   type: REGISTER_FAILURE,
 });
+
+
+export const forgetRequest = (user) => ({
+  type: AUTH_FORGET_PASSWORD,
+  payload: user,
+});
+export const forgetSuccess = () => ({
+  type: FORGET_PASSWORD_SUCCESS,
+});
+
+
+
+
+export const forgetFailure = (error) => ({
+  type: FORGET_PASSWORD_FAILURE,
+  payload: error,
+});
+
+
+export const changePasswordRequest = (user) => ({
+  type: AUTH_CHANGE_PASSWORD,
+  payload: user,
+});
+
+export const changePasswordSuccess = () => ({
+  type: CHANGE_PASSWORD_SUCCESS,
+});
+
+export const changePasswordFailure = (error) => ({
+  type: CHANGE_PASSWORD_FAILURE,
+  payload: error,
+});
+

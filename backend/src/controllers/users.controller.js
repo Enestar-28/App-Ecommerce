@@ -79,8 +79,8 @@ const updateMeController = async (req, res) =>{
 
 const forgotPassController = async (req, res) => {
     const result = await UserService.forgotPass(req.body)
+    console.log('result', result)
     return res.json({
-        message: 'forgot password',
         result
     })
 }

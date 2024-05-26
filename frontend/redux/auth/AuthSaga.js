@@ -6,20 +6,30 @@ import {
   logoutSuccess,
   registerSuccess,
   registerFailure,
+  forgetFailure,
+  forgetSuccess,
+  changePasswordSuccess,
+  changePasswordFailure,
 } from "./AuthActions";
 import {
   AUTH_LOGIN,
   AUTH_LOGOUT,
   AUTH_REGISTER,
+  AUTH_FORGET_PASSWORD,
+  AUTH_CHANGE_PASSWORD,
 } from "../../constants/constants.js";
-import axios from "axios";
-import { API_BASE_URL } from "@env";
-import { loginSuccessNavigate } from "./AuthActions";
+
 import {
   navigateToMain,
   navigateToLogin,
+  navigateToChangePass,
 } from "../../navigation/navigationHelpers.js";
-import { login, register } from "../../api/ApiUser.js";
+import {
+  login,
+  register,
+  forgetPassword,
+  rePassword,
+} from "../../api/ApiUser.js";
 function* loginSaga(action) {
   const { user, navigation } = action.payload;
 
@@ -51,7 +61,6 @@ function* registerSaga(action) {
     );
     yield put(registerSuccess());
     navigateToLogin(navigation);
-    
   } catch (error) {
     Alert.alert("Đăng kí lỗi", "Lỗi xảy ra trong quá trình đăng kí tài khoản");
     yield put(registerFailure());
@@ -71,6 +80,48 @@ function* logoutSaga() {
   }
 }
 
+function* forgetPasswordSaga(action) {
+  const { user, navigation } = action.payload;
+
+  try {
+    const response = yield call(forgetPassword, user);
+    Alert.alert(
+      "Gửi mã thành công",
+      `Mã xác nhận đã được gửi đến email của bạn: ${user.email}`
+    );
+
+    yield put(forgetSuccess());
+    navigateToChangePass(navigation, user.email);
+  } catch (error) {
+    Alert.alert(
+      "Lỗi gửi mã xác nhận",
+      "Nhập email không đúng hoặc không tồn tại trong hệ thống."
+    );
+    // Hiển thị thông báo quên mật khẩu thất bại
+    yield put(forgetFailure());
+  }
+}
+function* changePasswordSaga(action) {
+  const { user, navigation } = action.payload;
+  try {
+    const response = yield call(rePassword, user);
+    Alert.alert(
+      "Thay đổi mật khẩu thành công",
+      `Mật khẩu của bạn đã được thay đổi thành công`
+    );
+    yield put(changePasswordSuccess());
+    navigateToLogin(navigation);
+  } catch (error) {
+    Alert.alert(
+
+      "Mã xác nhận không đúng",
+      "Kiểm tra lại mã xác nhận rồi thử lại."
+    );
+    // Hiển thị thông báo quên mật khẩu thất bại
+    yield put(changePasswordFailure(error));
+  }
+}
+
 export function* watchLogout() {
   yield takeLatest(AUTH_LOGOUT, logoutSaga);
 }
@@ -81,4 +132,10 @@ export function* watchLogin() {
 
 export function* watchRegister() {
   yield takeLatest(AUTH_REGISTER, registerSaga);
+}
+export function* watchForgetPassword() {
+  yield takeLatest(AUTH_FORGET_PASSWORD, forgetPasswordSaga);
+}
+export function* watchChangePassword() {
+  yield takeLatest(AUTH_CHANGE_PASSWORD, changePasswordSaga);
 }

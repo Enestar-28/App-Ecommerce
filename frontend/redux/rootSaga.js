@@ -1,5 +1,11 @@
 import { all } from 'redux-saga/effects';
-import { watchLogout, watchLogin, watchRegister } from './auth/AuthSaga.js'; // Import các saga của bạn
+import {
+  watchLogout,
+  watchLogin,
+  watchRegister,
+  watchForgetPassword,
+  watchChangePassword,
+} from "./auth/AuthSaga.js"; // Import các saga của bạn
 import { watchFetchProducts,watchfetchProductsByCategorySaga } from './product/ProductSaga.js'; // Import các saga của bạn
 import { watchFetchCategories } from './categories/CategoriesSaga.js'; // Import các saga của bạn
 import { watchNavigate } from './navigate/NavigateSaga.js'; // Import các saga của bạn
@@ -10,6 +16,8 @@ export default function* rootSaga() {
     watchLogout(),
     watchLogin(),
     watchRegister(),
+    watchForgetPassword(),
+    watchChangePassword(),
     watchFetchProducts(),
     watchfetchProductsByCategorySaga(),
     watchNavigate(),
