@@ -20,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/auth/AuthActions.js";
 
-const LoginScreen = () => {
+const ChangePassScreen = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(null);
   const [password, setPassword] = useState("");
@@ -109,7 +109,7 @@ const LoginScreen = () => {
 
       <KeyboardAvoidingView>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles.loginText}>Đăng nhập tài khoản</Text>
+          <Text style={styles.loginText}>Lấy lại mật khẩu</Text>
         </View>
 
         <View style={{ marginTop: 70 }}>
@@ -125,44 +125,8 @@ const LoginScreen = () => {
             {emailError && (
               <Text style={{ color: "red", marginTop: 5 }}>{emailError}</Text>
             )}
-          
           </View>
         </View>
-
-        <View style={{ marginTop: 0 }}>
-          <View>
-            <View style={styles.inputContainer}>
-              <Entypo
-                name="key"
-                size={24}
-                color="gray"
-                style={{ marginLeft: 8 }}
-              />
-              <TextInput
-                onChangeText={handlePasswordChange}
-                secureTextEntry={!showPassword}
-                style={styles.input}
-                placeholder="Nhập Password"
-              />
-              <TouchableOpacity
-                onPress={toggleShowPassword}
-                style={{ right: 0, marginRight: 10 }}
-              >
-                <Entypo
-                  name={showPassword ? "eye" : "eye-with-line"}
-                  size={24}
-                  color="gray"
-                />
-              </TouchableOpacity>
-            </View>
-            {passwordError && (
-              <Text style={{ color: "red", marginTop: 5 }}>
-                {passwordError}
-              </Text>
-            )}
-          </View>
-        </View>
-
         <View
           style={{
             marginTop: 12,
@@ -171,26 +135,21 @@ const LoginScreen = () => {
             justifyContent: "space-between",
           }}
         >
-          <Text>Chúc bạn một ngày tốt lành</Text>
-
-          <Text style={styles.forgotPassword}
-            onPress={() => navigation.navigate("Forget")}
-          
-          >Quên mật khẩu</Text>
+          <Text style={{ marginLeft: 7 }}>
+            Nhấn gửi để nhận mã xác nhận email
+          </Text>
         </View>
 
         <View style={{ marginTop: 80 }} />
 
         <Pressable onPress={handleLogin} style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Đăng nhập</Text>
+          <Text style={styles.loginButtonText}>Gửi mã</Text>
         </Pressable>
 
         <Pressable
-          onPress={() => navigation.navigate("Register")}
+          onPress={() => navigation.navigate("ChangePassword")}
           style={{ marginTop: 15 }}
-        >
-          <Text style={styles.signUpText}>Bạn chưa có tài khoản? Đăng kí</Text>
-        </Pressable>
+        ></Pressable>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -231,6 +190,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: 300,
     fontSize: 16,
+    marginLeft: 5,
   },
   forgotPassword: {
     color: "#007FFF",
@@ -257,4 +217,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default ChangePassScreen;
